@@ -74,6 +74,7 @@ func main() {
 	router.Use(middleware.SetAccessControlHeaders)
 	router.Use(middleware.LogRequests)
 
+	router.HandleFunc("/", b.WebhookHandler()).Methods(http.MethodGet, http.MethodPost, http.MethodPut, http.MethodOptions) // routes to Bot handlers
 	router.HandleFunc("/ping", httpHandler.Ping).Methods(http.MethodGet)
 	router.HandleFunc("/cron", httpHandler.CronTrigger).Methods(http.MethodGet)
 
