@@ -58,12 +58,14 @@ func main() {
 				Text:   "Hello there! What can I do for you today?",
 			})
 		}),
+		bot.WithMiddlewares(middleware.LogBotRequests),
 	}
 	b, err := bot.New(os.Getenv("BOT_TOKEN"), opts...)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	b.RegisterHandler(bot.HandlerTypeMessageText, "start", bot.MatchTypeCommand, chatService.Start)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "hello", bot.MatchTypeCommand, chatService.ReplyHello)
 
 	go b.StartWebhook(ctx)
