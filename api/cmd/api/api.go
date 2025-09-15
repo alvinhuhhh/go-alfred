@@ -1,15 +1,20 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
 	"net/url"
 	"os"
+	"os/signal"
 
+	"github.com/alvinhuhhh/go-alfred/internal/chat"
 	"github.com/alvinhuhhh/go-alfred/internal/handlers"
 	"github.com/alvinhuhhh/go-alfred/internal/middleware"
+	"github.com/go-telegram/bot"
+	"github.com/go-telegram/bot/models"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v5"
@@ -23,7 +28,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	_, err = getDB()
+	db, err := getDB()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,36 +38,36 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// chatRepo, err := chat.NewRepo(db)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// chatService, err := chat.NewService(chatRepo)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	chatRepo, err := chat.NewRepo(db)
+	if err != nil {
+		log.Fatal(err)
+	}
+	chatService, err := chat.NewService(chatRepo)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Bot handler
-	// ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
-	// defer cancel()
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
 
-	// opts := []bot.Option{
-	// 	bot.WithDefaultHandler(func(ctx context.Context, b *bot.Bot, update *models.Update) {
-	// 		b.SendMessage(ctx, &bot.SendMessageParams{
-	// 			ChatID: update.Message.Chat.ID,
-	// 			Text:   "Hello there! What can I do for you today?",
-	// 		})
-	// 	}),
-	// }
-	// b, err := bot.New(os.Getenv("BOT_TOKEN"), opts...)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	opts := []bot.Option{
+		bot.WithDefaultHandler(func(ctx context.Context, b *bot.Bot, update *models.Update) {
+			b.SendMessage(ctx, &bot.SendMessageParams{
+				ChatID: update.Message.Chat.ID,
+				Text:   "Hello there! What can I do for you today?",
+			})
+		}),
+	}
+	b, err := bot.New(os.Getenv("BOT_TOKEN"), opts...)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	// b.RegisterHandler(bot.HandlerTypeMessageText, "hello", bot.MatchTypeCommand, chatService.ReplyHello)
+	b.RegisterHandler(bot.HandlerTypeMessageText, "hello", bot.MatchTypeCommand, chatService.ReplyHello)
 
-	// go b.StartWebhook(ctx)
-	// slog.Info("Bot webhook listener started")
+	go b.StartWebhook(ctx)
+	slog.Info("Bot webhook listener started")
 
 	// HTTP handler
 	router := mux.NewRouter()
