@@ -1,4 +1,4 @@
-name: API Image Build and Publish
+name: API Image Build, Publish and Deploy DEV to DigitalOcean
 
 on: 
   push:
@@ -32,3 +32,8 @@ jobs:
           context: ./api
           push: true
           tags: ghcr.io/${{ github.repository }}:latest
+
+      - name: Deploy to DigitalOcean
+        uses: digitalocean/app_action/deploy@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
