@@ -202,7 +202,8 @@ func (s service) CronTrigger(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		slog.Info("inserted dinner id: %v", id)
+		slog.Info(fmt.Sprintf("inserted dinner id: %v", id))
+		d.ID = id
 	}
 
 	// Send message
