@@ -16,7 +16,6 @@ import (
 	"github.com/alvinhuhhh/go-alfred/internal/handlers"
 	"github.com/alvinhuhhh/go-alfred/internal/middleware"
 	"github.com/go-telegram/bot"
-	"github.com/go-telegram/bot/models"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -71,12 +70,12 @@ func main() {
 	defer cancel()
 
 	opts := []bot.Option{
-		bot.WithDefaultHandler(func(ctx context.Context, b *bot.Bot, update *models.Update) {
-			b.SendMessage(ctx, &bot.SendMessageParams{
-				ChatID: update.Message.Chat.ID,
-				Text:   "Hello there! What can I do for you today?",
-			})
-		}),
+		// bot.WithDefaultHandler(func(ctx context.Context, b *bot.Bot, update *models.Update) {
+		// 	b.SendMessage(ctx, &bot.SendMessageParams{
+		// 		ChatID: update.Message.Chat.ID,
+		// 		Text:   "Hello there! What can I do for you today?",
+		// 	})
+		// }),
 		// bot.WithMiddlewares(middleware.LogBotRequests),
 	}
 	b, err := bot.New(os.Getenv("BOT_TOKEN"), opts...)

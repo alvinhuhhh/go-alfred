@@ -68,16 +68,15 @@ func (s service) HandleCallbackQuery(ctx context.Context, b *bot.Bot, update *mo
 		CallbackQueryID: update.CallbackQuery.ID,
 		ShowAlert:       false,
 	})
-	chatId := update.CallbackQuery.Message.Message.Chat.ID
 	callbackData := update.CallbackQuery.Data
 
 	switch callbackData {
 	case "yes":
-		slog.Info(fmt.Sprintf("received yes from id: %v", chatId))
+		slog.Info(fmt.Sprintf("received yes"))
 		return
 
 	case "no":
-		slog.Info(fmt.Sprintf("received no from id: %v", chatId))
+		slog.Info(fmt.Sprintf("received no"))
 		return
 
 	default:
