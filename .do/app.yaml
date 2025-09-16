@@ -32,10 +32,10 @@ services:
     value: EV[1:ZhNQaMfjUx779LNVNUZcgS17ZCBw+LjH:7cCgiaWQcHIpOC+MS5GeIJHReEjD/8YhkhxSig3aBYs=]
   - key: DB_HOST
     scope: RUN_AND_BUILD_TIME
-    value: fly-0-sin.pooler.supabase.com
+    value: db.inhapokrmngzktjvhlju.supabase.co
   - key: DB_PORT
     scope: RUN_AND_BUILD_TIME
-    value: "6543"
+    value: "5432"
   - key: DB_NAME
     scope: RUN_AND_BUILD_TIME
     value: postgres
