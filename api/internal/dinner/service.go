@@ -72,7 +72,7 @@ func (s service) HandleCallbackQuery(ctx context.Context, b *bot.Bot, update *mo
 	// Answer callback query first so that Telegram stops spamming updates
 	b.AnswerCallbackQuery(ctx, &bot.AnswerCallbackQueryParams{
 		CallbackQueryID: update.CallbackQuery.ID,
-		ShowAlert: false,
+		ShowAlert:       false,
 	})
 	s.HandleDinner(ctx, b, update)
 }
@@ -125,6 +125,7 @@ func (s service) getOrInsertDinner(ctx context.Context, b *bot.Bot, update *mode
 		// Insert new Dinner
 		d = &Dinner{
 			ChatID:     update.Message.Chat.ID,
+			Date:       time.Now(),
 			Yes:        []string{update.Message.From.FirstName},
 			No:         []string{},
 			MessageIds: []int{update.Message.ID},
