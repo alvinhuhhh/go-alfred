@@ -36,6 +36,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.Close()
 
 	err = runMigrations(db.DB)
 	if err != nil && err != migrate.ErrNoChange {

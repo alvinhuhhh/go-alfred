@@ -164,5 +164,5 @@ func (s service) parseDinnerMessage(d *Dinner) string {
 	for _, v := range d.No {
 		no += fmt.Sprintf("%s\n", v)
 	}
-	return fmt.Sprintf("\n<b>Dinner tonight:</b>\nDate: %s\n\n<u>YES:</u>\n%s\n\n<u>NO:</u>\n%s", date, yes, no)
+	return fmt.Sprintf("\n<b>Dinner tonight:</b>\nDate: %s\n\n<u>YES:</u>\n%s\n\n<u>NO:</u>\n%s", date.Format("YYYY-MM-DD"), yes, no)
 }
