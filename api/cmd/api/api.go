@@ -77,7 +77,7 @@ func main() {
 				Text:   "Hello there! What can I do for you today?",
 			})
 		}),
-		bot.WithMiddlewares(middleware.LogBotRequests),
+		// bot.WithMiddlewares(middleware.LogBotRequests),
 	}
 	b, err := bot.New(os.Getenv("BOT_TOKEN"), opts...)
 	if err != nil {
