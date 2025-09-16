@@ -89,6 +89,8 @@ func main() {
 
 	b.RegisterHandler(bot.HandlerTypeMessageText, "getdinner", bot.MatchTypeCommand, dinnerService.HandleDinner)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "enddinner", bot.MatchTypeCommand, dinnerService.HandleDinner)
+	b.RegisterHandler(bot.HandlerTypeCallbackQueryData, "joindinner", bot.MatchTypeExact, dinnerService.HandleCallbackQuery)
+	b.RegisterHandler(bot.HandlerTypeCallbackQueryData, "leavedinner", bot.MatchTypeExact, dinnerService.HandleCallbackQuery)
 
 	go b.StartWebhook(ctx)
 	slog.Info("Bot webhook listener started")

@@ -156,8 +156,8 @@ func (s service) getKeyboard() *models.InlineKeyboardMarkup {
 	return &models.InlineKeyboardMarkup{
 		InlineKeyboard: [][]models.InlineKeyboardButton{
 			{
-				{Text: "Join Dinner", CallbackData: "yes"},
-				{Text: "Leave Dinner", CallbackData: "no"},
+				{Text: "Join Dinner", CallbackData: "joindinner"},
+				{Text: "Leave Dinner", CallbackData: "leavedinner"},
 			},
 		},
 	}
