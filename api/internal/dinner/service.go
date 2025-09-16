@@ -10,6 +10,7 @@ import (
 	"github.com/alvinhuhhh/go-alfred/internal/chat"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	"github.com/lib/pq"
 )
 
 type Service interface {
@@ -128,7 +129,7 @@ func (s service) getOrInsertDinner(ctx context.Context, b *bot.Bot, update *mode
 			Date:       time.Now(),
 			Yes:        []string{update.Message.From.FirstName},
 			No:         []string{},
-			MessageIds: []int{update.Message.ID},
+			MessageIds: pq.Int64Array{int64(update.Message.ID)},
 		}
 		id, err := s.repo.InsertDinner(ctx, d)
 		if err != nil {
