@@ -30,20 +30,26 @@ func NewService(r Repo, cr chat.Repo) (Service, error) {
 }
 
 func (s service) HandleDinner(ctx context.Context, b *bot.Bot, update *models.Update) {
-	s.verifyChat(ctx, b, update)
+	_, err := s.verifyChat(ctx, b, update)
+	if err != nil {
+		slog.Error("error verifying chat")
+		return
+	}
 	command := update.Message.Text
 
 	switch command {
 	case "/getdinner":
 		d, err := s.getOrInsertDinner(ctx, b, update)
-		if err == nil {
-			b.SendMessage(ctx, &bot.SendMessageParams{
-				ChatID:      update.Message.Chat.ID,
-				Text:        s.parseDinnerMessage(d),
-				ParseMode:   models.ParseModeHTML,
-				ReplyMarkup: s.getKeyboard(),
-			})
+		if err != nil {
+			slog.Error("error getting dinner")
+			return
 		}
+		b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID:      update.Message.Chat.ID,
+			Text:        s.parseDinnerMessage(d),
+			ParseMode:   models.ParseModeHTML,
+			ReplyMarkup: s.getKeyboard(),
+		})
 		return
 
 	case "/joindinner":
@@ -71,8 +77,8 @@ func (s service) HandleCallbackQuery(ctx context.Context, b *bot.Bot, update *mo
 	s.HandleDinner(ctx, b, update)
 }
 
-func (s service) verifyChat(ctx context.Context, b *bot.Bot, update *models.Update) {
-	_, err := s.chatRepo.GetChatByID(ctx, update.Message.Chat.ID)
+func (s service) verifyChat(ctx context.Context, b *bot.Bot, update *models.Update) (*chat.Chat, error) {
+	c, err := s.chatRepo.GetChatByID(ctx, update.Message.Chat.ID)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			// Handle any other error
@@ -80,23 +86,25 @@ func (s service) verifyChat(ctx context.Context, b *bot.Bot, update *models.Upda
 				ChatID: update.Message.Chat.ID,
 				Text:   "Sorry! Having a bit of trouble, will be back soon!",
 			})
-			return
+			return nil, err
 		}
 
 		// Insert new Chat
-		id, err := s.chatRepo.InsertChat(ctx, &chat.Chat{
+		c = &chat.Chat{
 			ID:   update.Message.Chat.ID,
 			Type: string(update.Message.Chat.Type),
-		})
+		}
+		id, err := s.chatRepo.InsertChat(ctx, c)
 		if err != nil {
 			b.SendMessage(ctx, &bot.SendMessageParams{
 				ChatID: update.Message.Chat.ID,
 				Text:   "Sorry! Having a bit of trouble, will be back soon!",
 			})
-			return
+			return nil, err
 		}
 		slog.Info(fmt.Sprintf("inserted chat id: %v", id))
 	}
+	return c, nil
 }
 
 func (s service) getOrInsertDinner(ctx context.Context, b *bot.Bot, update *models.Update) (*Dinner, error) {
