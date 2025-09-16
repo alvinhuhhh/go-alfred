@@ -20,11 +20,7 @@ func NewRepo(db *sqlx.DB) (Repo, error) {
 }
 
 func (r repo) GetChatByID(ctx context.Context, id int64) (*Chat, error) {
-	query := `
-		SELECT id, type
-		FROM chats
-		WHERE id = ?
-	`
+	query := "SELECT id, type FROM chats WHERE id = ?"
 	query = r.db.Rebind(query)
 	var c Chat
 	if err := r.db.GetContext(ctx, &c, query, id); err != nil {
@@ -34,10 +30,7 @@ func (r repo) GetChatByID(ctx context.Context, id int64) (*Chat, error) {
 }
 
 func (r repo) InsertChat(ctx context.Context, chat *Chat) (int64, error) {
-	query := `
-		INSERT INTO chats(id, type)
-		VALUES (?,?)
-	`
+	query := "INSERT INTO chats(id, type) VALUES (?,?)"
 	query = r.db.Rebind(query)
 	_, err := r.db.ExecContext(ctx, query, &chat.ID, &chat.Type)
 	if err != nil {

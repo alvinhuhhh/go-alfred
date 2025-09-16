@@ -21,17 +21,7 @@ func NewRepo(db *sqlx.DB) (Repo, error) {
 }
 
 func (r repo) GetDinnerByDateAndChatId(ctx context.Context, chatId int64, date time.Time) (*Dinner, error) {
-	query := `
-		SELECT
-			chatId,
-			date,
-			yes,
-			no,
-			messageIds
-		FROM dinners
-		WHERE chatId = ?
-		AND date = ?
-	`
+	query := "SELECT chatId, date, yes, no, messageIds FROM dinner WHERE chatId = ? AND date = ?"
 	query = r.db.Rebind(query)
 	var d Dinner
 	err := r.db.GetContext(ctx, &d, query, chatId, date)
@@ -42,16 +32,7 @@ func (r repo) GetDinnerByDateAndChatId(ctx context.Context, chatId int64, date t
 }
 
 func (r repo) InsertDinner(ctx context.Context, dinner *Dinner) (int64, error) {
-	query := `
-		INSERT INTO dinners(
-			chatId,
-			date,
-			yes,
-			no,
-			messageIds
-		) VALUES (?,?,?,?,?)
-		RETURNING id
-	`
+	query := "INSERT INTO dinners(chatId, date, yes, no, messageIds) VALUES (?,?,?,?,?) RETURNING id"
 	query = r.db.Rebind(query)
 	var id int64
 	err := r.db.QueryRowContext(ctx, query, &dinner.ChatID, &dinner.Date, &dinner.Yes, &dinner.No, &dinner.MessageIds).Scan(&id)
