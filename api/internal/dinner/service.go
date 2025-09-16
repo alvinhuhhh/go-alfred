@@ -5,10 +5,13 @@ import (
 	"database/sql"
 	"fmt"
 	"log/slog"
+	"slices"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/alvinhuhhh/go-alfred/internal/chat"
+	"github.com/alvinhuhhh/go-alfred/internal/util"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"github.com/lib/pq"
@@ -50,7 +53,7 @@ func (s service) HandleDinner(ctx context.Context, b *bot.Bot, update *models.Up
 			ChatID:      update.Message.Chat.ID,
 			Text:        s.parseDinnerMessage(d),
 			ParseMode:   models.ParseModeHTML,
-			ReplyMarkup: s.getKeyboard(),
+			ReplyMarkup: s.getKeyboard(d.ID),
 		})
 		return
 
@@ -68,19 +71,58 @@ func (s service) HandleCallbackQuery(ctx context.Context, b *bot.Bot, update *mo
 		CallbackQueryID: update.CallbackQuery.ID,
 		ShowAlert:       false,
 	})
+
 	callbackData := update.CallbackQuery.Data
+	username := update.CallbackQuery.Message.Message.From.FirstName
 
-	switch callbackData {
-	case "yes":
-		slog.Info(fmt.Sprintf("received yes"))
+	// Get dinner
+	split := strings.Split(callbackData, "_")
+	dinnerId, err := strconv.Atoi(split[1])
+	if err != nil {
+		slog.Error("unable to parse dinner id from callback query data")
 		return
+	}
+	dinner, err := s.repo.GetDinnerById(ctx, int64(dinnerId))
+	if err != nil {
+		slog.Error("unable to get dinner")
+		return
+	}
 
-	case "no":
-		slog.Info(fmt.Sprintf("received no"))
-		return
+	switch split[0] {
+	case "joindinner":
+		dinner.Yes = append(dinner.Yes, username)
+		if slices.Contains(dinner.No, username) {
+			dinner.No = util.Remove(dinner.No, username)
+		}
+
+	case "leavedinner":
+		dinner.No = append(dinner.No, username)
+		if slices.Contains(dinner.Yes, username) {
+			dinner.Yes = util.Remove(dinner.Yes, username)
+		}
 
 	default:
+		slog.Warn(fmt.Sprintf("unknown callback: %s", split[0]))
 		return
+	}
+
+	// Send response
+	message, err := b.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID: update.CallbackQuery.Message.Message.Chat.ID,
+		Text: s.parseDinnerMessage(dinner),
+		ParseMode: models.ParseModeHTML,
+		ReplyMarkup: s.getKeyboard(dinner.ID),
+	})
+	if err != nil {
+		slog.Error(err.Error())
+	}
+
+	// Append message ID
+	dinner.MessageIds = append(dinner.MessageIds, int64(message.ID))
+
+	// Insert db
+	if err := s.repo.UpdateDinner(ctx, dinner); err != nil {
+		slog.Error(err.Error())
 	}
 }
 
@@ -147,16 +189,17 @@ func (s service) getOrInsertDinner(ctx context.Context, b *bot.Bot, update *mode
 			return nil, err
 		}
 		slog.Info(fmt.Sprintf("inserted dinner id: %v", id))
+		d.ID = id
 	}
 	return d, nil
 }
 
-func (s service) getKeyboard() *models.InlineKeyboardMarkup {
+func (s service) getKeyboard(id int64) *models.InlineKeyboardMarkup {
 	return &models.InlineKeyboardMarkup{
 		InlineKeyboard: [][]models.InlineKeyboardButton{
 			{
-				{Text: "Join Dinner", CallbackData: "joindinner"},
-				{Text: "Leave Dinner", CallbackData: "leavedinner"},
+				{Text: "Join Dinner", CallbackData: fmt.Sprintf("joindinner_%d", id)},
+				{Text: "Leave Dinner", CallbackData: fmt.Sprintf("leavedinner_%d", id)},
 			},
 		},
 	}

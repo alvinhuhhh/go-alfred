@@ -7,6 +7,7 @@ import (
 )
 
 type Dinner struct {
+	ID         int64         `db:"id"`
 	Date       time.Time     `db:"date"`
 	ChatID     int64         `db:"chat_id"`
 	Yes        []string      `db:"yes"`

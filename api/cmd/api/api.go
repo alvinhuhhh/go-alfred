@@ -10,14 +10,12 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
-	"strconv"
 
 	"github.com/alvinhuhhh/go-alfred/internal/chat"
 	"github.com/alvinhuhhh/go-alfred/internal/dinner"
 	"github.com/alvinhuhhh/go-alfred/internal/handlers"
 	"github.com/alvinhuhhh/go-alfred/internal/middleware"
 	"github.com/go-telegram/bot"
-	"github.com/go-telegram/bot/models"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -72,14 +70,7 @@ func main() {
 	defer cancel()
 
 	opts := []bot.Option{
-		bot.WithDefaultHandler(func(ctx context.Context, b *bot.Bot, update *models.Update) {
-			if update.Message != nil {
-				slog.Warn(fmt.Sprintf("unhandled message with id: %s", strconv.Itoa(update.Message.ID)))
-			}
-			if update.CallbackQuery != nil {
-				slog.Warn(fmt.Sprintf("unhandled callback with id: %v", update.CallbackQuery.ID))
-			}
-		}),
+		bot.WithDefaultHandler(chatService.DefaultHandler),
 		bot.WithMiddlewares(middleware.LogBotRequests),
 	}
 	b, err := bot.New(os.Getenv("BOT_TOKEN"), opts...)
@@ -92,8 +83,8 @@ func main() {
 
 	b.RegisterHandler(bot.HandlerTypeMessageText, "getdinner", bot.MatchTypeCommand, dinnerService.HandleDinner)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "enddinner", bot.MatchTypeCommand, dinnerService.HandleDinner)
-	b.RegisterHandler(bot.HandlerTypeCallbackQueryData, "joindinner", bot.MatchTypeContains, dinnerService.HandleCallbackQuery)
-	b.RegisterHandler(bot.HandlerTypeCallbackQueryData, "leavedinner", bot.MatchTypeContains, dinnerService.HandleCallbackQuery)
+	b.RegisterHandler(bot.HandlerTypeCallbackQueryData, "joindinner", bot.MatchTypePrefix, dinnerService.HandleCallbackQuery)
+	b.RegisterHandler(bot.HandlerTypeCallbackQueryData, "leavedinner", bot.MatchTypePrefix, dinnerService.HandleCallbackQuery)
 
 	go b.StartWebhook(ctx)
 	slog.Info("Bot webhook listener started")

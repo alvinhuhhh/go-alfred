@@ -5,12 +5,14 @@ import (
 	"database/sql"
 	"fmt"
 	"log/slog"
+	"strconv"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 )
 
-type Service interface{
+type Service interface {
+	DefaultHandler(ctx context.Context, b *bot.Bot, update *models.Update)
 	Start(ctx context.Context, b *bot.Bot, update *models.Update)
 	ReplyHello(ctx context.Context, b *bot.Bot, update *models.Update)
 }
@@ -23,32 +25,47 @@ func NewService(r Repo) (Service, error) {
 	return &service{repo: r}, nil
 }
 
+func (s service) DefaultHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
+	if update.Message != nil {
+		slog.Warn(fmt.Sprintf("unhandled message with id: %s", strconv.Itoa(update.Message.ID)))
+	}
+	if update.CallbackQuery != nil {
+		slog.Warn(fmt.Sprintf("unhandled callback with id: %v", update.CallbackQuery.ID))
+
+		// Answer callback query first so that Telegram stops spamming updates
+		b.AnswerCallbackQuery(ctx, &bot.AnswerCallbackQueryParams{
+			CallbackQueryID: update.CallbackQuery.ID,
+			ShowAlert:       false,
+		})
+	}
+}
+
 func (s *service) Start(ctx context.Context, b *bot.Bot, update *models.Update) {
-	_, err := s.repo.GetChatByID(ctx, update.Message.Chat.ID); 
+	_, err := s.repo.GetChatByID(ctx, update.Message.Chat.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			b.SendMessage(ctx, &bot.SendMessageParams{
 				ChatID: update.Message.Chat.ID,
-				Text: "Hello there! Let me get set up and we will be ready to go",
+				Text:   "Hello there! Let me get set up and we will be ready to go",
 			})
 
 			// Insert new Chat
 			id, err := s.repo.InsertChat(ctx, &Chat{
-				ID: update.Message.Chat.ID,
+				ID:   update.Message.Chat.ID,
 				Type: string(update.Message.Chat.Type),
-			});
+			})
 			if err != nil {
 				b.SendMessage(ctx, &bot.SendMessageParams{
 					ChatID: update.Message.Chat.ID,
-					Text: "Sorry! Having a bit of trouble, will be back soon!",
+					Text:   "Sorry! Having a bit of trouble, will be back soon!",
 				})
-				return	
+				return
 			}
 
 			slog.Info(fmt.Sprintf("inserted chat id: %v", id))
 			b.SendMessage(ctx, &bot.SendMessageParams{
 				ChatID: update.Message.Chat.ID,
-				Text: "Done! How can I help?",
+				Text:   "Done! How can I help?",
 			})
 			return
 		}
@@ -56,21 +73,21 @@ func (s *service) Start(ctx context.Context, b *bot.Bot, update *models.Update) 
 		// Handle any other error
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: update.Message.Chat.ID,
-			Text: "Sorry! Having a bit of trouble, will be back soon!",
+			Text:   "Sorry! Having a bit of trouble, will be back soon!",
 		})
 		return
-	} 
+	}
 
 	slog.Info("chat already exists")
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: update.Message.Chat.ID,
-		Text: "Welcome back!",
+		Text:   "Welcome back!",
 	})
 }
 
 func (s *service) ReplyHello(ctx context.Context, b *bot.Bot, update *models.Update) {
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: update.Message.Chat.ID,
-		Text: "Hello there! What can I do for you today?",
+		Text:   "Hello there! What can I do for you today?",
 	})
 }
