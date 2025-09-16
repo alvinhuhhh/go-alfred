@@ -78,7 +78,7 @@ func main() {
 	b.RegisterHandler(bot.HandlerTypeMessageText, "start", bot.MatchTypeCommand, chatService.Start)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "hello", bot.MatchTypeCommand, chatService.ReplyHello)
 
-	b.RegisterHandler(bot.HandlerTypeMessageText, "startdinner", bot.MatchTypeCommand, dinnerService.HandleDinner)
+	b.RegisterHandler(bot.HandlerTypeMessageText, "getdinner", bot.MatchTypeCommand, dinnerService.HandleDinner)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "joindinner", bot.MatchTypeCommand, dinnerService.HandleDinner)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "leavedinner", bot.MatchTypeCommand, dinnerService.HandleDinner)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "enddinner", bot.MatchTypeCommand, dinnerService.HandleDinner)
