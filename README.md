@@ -30,6 +30,7 @@ Alfred is a Telegram bot that handles repetitive administrative duties for famil
 ## Infrastructure
 
 - [Supabase](https://supabase.com/)
+- [DigitalOcean](https://cloud.digitalocean.com/)
 
 ## CI/CD
 

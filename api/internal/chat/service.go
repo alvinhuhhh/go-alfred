@@ -44,7 +44,12 @@ func (s *service) Start(ctx context.Context, b *bot.Bot, update *models.Update) 
 				})
 				return	
 			}
-			slog.Info(fmt.Sprintf("added chat to db, id: %v", id))
+
+			slog.Info(fmt.Sprintf("inserted chat id: %v", id))
+			b.SendMessage(ctx, &bot.SendMessageParams{
+				ChatID: update.Message.Chat.ID,
+				Text: "Done! How can I help?",
+			})
 			return
 		}
 

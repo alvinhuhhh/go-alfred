@@ -11,6 +11,7 @@ import (
 	"os/signal"
 
 	"github.com/alvinhuhhh/go-alfred/internal/chat"
+	"github.com/alvinhuhhh/go-alfred/internal/dinner"
 	"github.com/alvinhuhhh/go-alfred/internal/handlers"
 	"github.com/alvinhuhhh/go-alfred/internal/middleware"
 	"github.com/go-telegram/bot"
@@ -47,6 +48,15 @@ func main() {
 		log.Fatal(err)
 	}
 
+	dinnerRepo, err := dinner.NewRepo(db)
+	if err != nil {
+		log.Fatal(err)
+	}
+	dinnerService, err := dinner.NewService(dinnerRepo, chatRepo)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Bot handler
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
@@ -67,6 +77,11 @@ func main() {
 
 	b.RegisterHandler(bot.HandlerTypeMessageText, "start", bot.MatchTypeCommand, chatService.Start)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "hello", bot.MatchTypeCommand, chatService.ReplyHello)
+
+	b.RegisterHandler(bot.HandlerTypeMessageText, "startdinner", bot.MatchTypeCommand, dinnerService.HandleDinner)
+	b.RegisterHandler(bot.HandlerTypeMessageText, "joindinner", bot.MatchTypeCommand, dinnerService.HandleDinner)
+	b.RegisterHandler(bot.HandlerTypeMessageText, "leavedinner", bot.MatchTypeCommand, dinnerService.HandleDinner)
+	b.RegisterHandler(bot.HandlerTypeMessageText, "enddinner", bot.MatchTypeCommand, dinnerService.HandleDinner)
 
 	go b.StartWebhook(ctx)
 	slog.Info("Bot webhook listener started")
