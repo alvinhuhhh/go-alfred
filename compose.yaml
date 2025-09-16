@@ -5,7 +5,7 @@ services:
       context: ./db
     restart: always
     environment:
-      - POSTGRES_DB=alfred-db
+      - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
@@ -20,14 +20,16 @@ services:
     image: alfred-api
     build:
       context: ./api
+    volumes:
+      - ./api:/app
     restart: always
     environment:
       - PORT=8080
       - BOT_TOKEN=token
       - DB_USER=postgres
       - DB_PASSWORD=postgres
-      - DB_HOST=localhost
-      - DB_PORT=6432
+      - DB_HOST=db
+      - DB_PORT=5432
       - DB_NAME=postgres
     ports:
       - 8080:8080

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"log/slog"
@@ -16,6 +17,8 @@ import (
 	"github.com/alvinhuhhh/go-alfred/internal/middleware"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v5"
@@ -31,6 +34,11 @@ func main() {
 
 	db, err := getDB()
 	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = runMigrations(db.DB)
+	if err != nil && err != migrate.ErrNoChange {
 		log.Fatal(err)
 	}
 
@@ -126,4 +134,20 @@ func getDB() (*sqlx.DB, error) {
 	}
 
 	return db, nil
+}
+
+func runMigrations(db *sql.DB) error {
+	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	if err != nil {
+		return err
+	}
+	mig, err := migrate.NewWithDatabaseInstance(
+		"file://migrations",
+		"postgres",
+		driver,
+	)
+	if err != nil {
+		return err
+	}
+	return mig.Up()
 }
