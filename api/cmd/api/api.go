@@ -74,13 +74,13 @@ func main() {
 	opts := []bot.Option{
 		bot.WithDefaultHandler(func(ctx context.Context, b *bot.Bot, update *models.Update) {
 			if update.Message != nil {
-				slog.Info(strconv.Itoa(update.Message.ID))
+				slog.Warn(fmt.Sprintf("unhandled message with id: %s", strconv.Itoa(update.Message.ID)))
 			}
 			if update.CallbackQuery != nil {
-				slog.Info(update.CallbackQuery.ID)
+				slog.Warn(fmt.Sprintf("unhandled callback with id: %v", update.CallbackQuery.ID))
 			}
 		}),
-		// bot.WithMiddlewares(middleware.LogBotRequests),
+		bot.WithMiddlewares(middleware.LogBotRequests),
 	}
 	b, err := bot.New(os.Getenv("BOT_TOKEN"), opts...)
 	if err != nil {
