@@ -178,19 +178,31 @@ func (s service) CronTrigger(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create dinner
-	d := &Dinner{
-		ChatID:     ct.ChatId,
-		Date:       time.Now(),
-		Yes:        []string{},
-		No:         []string{},
-		MessageIds: pq.Int64Array{},
-	}
-	id, err := s.repo.InsertDinner(r.Context(), d)
+	// Check if dinner exists
+	d, err := s.repo.GetDinnerByDateAndChatId(r.Context(), ct.ChatId, time.Now())
 	if err != nil {
-		slog.Error(err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		if err != sql.ErrNoRows {
+			// Any other error
+			slog.Error(err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		// Insert new dinner
+		d = &Dinner{
+			ChatID:     ct.ChatId,
+			Date:       time.Now(),
+			Yes:        []string{},
+			No:         []string{},
+			MessageIds: pq.Int64Array{},
+		}
+		id, err := s.repo.InsertDinner(r.Context(), d)
+		if err != nil {
+			slog.Error(err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		slog.Info("inserted dinner id: %v", id)
 	}
 
 	// Send message
@@ -198,7 +210,7 @@ func (s service) CronTrigger(w http.ResponseWriter, r *http.Request) {
 		ChatID:      ct.ChatId,
 		Text:        s.parseDinnerMessage(d),
 		ParseMode:   models.ParseModeHTML,
-		ReplyMarkup: s.getKeyboard(id),
+		ReplyMarkup: s.getKeyboard(d.ID),
 	})
 	if err != nil {
 		slog.Error(err.Error())
