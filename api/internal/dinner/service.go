@@ -82,6 +82,7 @@ func (s service) verifyChat(ctx context.Context, b *bot.Bot, update *models.Upda
 	if err != nil {
 		if err != sql.ErrNoRows {
 			// Handle any other error
+			slog.Error(err.Error())
 			b.SendMessage(ctx, &bot.SendMessageParams{
 				ChatID: update.Message.Chat.ID,
 				Text:   "Sorry! Having a bit of trouble, will be back soon!",
@@ -96,6 +97,7 @@ func (s service) verifyChat(ctx context.Context, b *bot.Bot, update *models.Upda
 		}
 		id, err := s.chatRepo.InsertChat(ctx, c)
 		if err != nil {
+			slog.Error(err.Error())
 			b.SendMessage(ctx, &bot.SendMessageParams{
 				ChatID: update.Message.Chat.ID,
 				Text:   "Sorry! Having a bit of trouble, will be back soon!",
@@ -112,6 +114,7 @@ func (s service) getOrInsertDinner(ctx context.Context, b *bot.Bot, update *mode
 	if err != nil {
 		if err != sql.ErrNoRows {
 			// Any other error
+			slog.Error(err.Error())
 			b.SendMessage(ctx, &bot.SendMessageParams{
 				ChatID: update.Message.Chat.ID,
 				Text:   "Sorry! Having a bit of trouble, will be back soon!",
@@ -128,6 +131,7 @@ func (s service) getOrInsertDinner(ctx context.Context, b *bot.Bot, update *mode
 		}
 		id, err := s.repo.InsertDinner(ctx, d)
 		if err != nil {
+			slog.Error(err.Error())
 			b.SendMessage(ctx, &bot.SendMessageParams{
 				ChatID: update.Message.Chat.ID,
 				Text:   "Sorry! Having a bit of trouble, will be back soon!",
