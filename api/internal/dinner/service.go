@@ -58,6 +58,24 @@ func (s service) HandleDinner(ctx context.Context, b *bot.Bot, update *models.Up
 		return
 
 	case "/enddinner":
+		d, err := s.getOrInsertDinner(ctx, b, update)
+		if err != nil {
+			slog.Error("error getting dinner")
+			return
+		}
+		err = s.repo.DeleteDinner(ctx, d.ID)
+		if err != nil {
+			slog.Error("unable to delete dinner")
+			b.SendMessage(ctx, &bot.SendMessageParams{
+				ChatID: update.Message.Chat.ID,
+				Text: "Sorry, I can't delete tonight's dinner",
+			})
+			return
+		}
+		b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID: update.Message.Chat.ID,
+			Text: "No more dinner for tonight!",
+		})
 		return
 
 	default:
@@ -73,7 +91,7 @@ func (s service) HandleCallbackQuery(ctx context.Context, b *bot.Bot, update *mo
 	})
 
 	callbackData := update.CallbackQuery.Data
-	username := update.CallbackQuery.Message.Message.From.FirstName
+	name := update.CallbackQuery.From.FirstName
 
 	// Get dinner
 	split := strings.Split(callbackData, "_")
@@ -90,15 +108,15 @@ func (s service) HandleCallbackQuery(ctx context.Context, b *bot.Bot, update *mo
 
 	switch split[0] {
 	case "joindinner":
-		dinner.Yes = append(dinner.Yes, username)
-		if slices.Contains(dinner.No, username) {
-			dinner.No = util.Remove(dinner.No, username)
+		dinner.Yes = append(dinner.Yes, name)
+		if slices.Contains(dinner.No, name) {
+			dinner.No = util.Remove(dinner.No, name)
 		}
 
 	case "leavedinner":
-		dinner.No = append(dinner.No, username)
-		if slices.Contains(dinner.Yes, username) {
-			dinner.Yes = util.Remove(dinner.Yes, username)
+		dinner.No = append(dinner.No, name)
+		if slices.Contains(dinner.Yes, name) {
+			dinner.Yes = util.Remove(dinner.Yes, name)
 		}
 
 	default:

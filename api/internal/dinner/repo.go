@@ -13,6 +13,7 @@ type Repo interface {
 	GetDinnerByDateAndChatId(ctx context.Context, chatId int64, date time.Time) (*Dinner, error)
 	InsertDinner(ctx context.Context, d *Dinner) (int64, error)
 	UpdateDinner(ctx context.Context, d *Dinner) error
+	DeleteDinner(ctx context.Context, id int64) error
 }
 
 type repo struct {
@@ -60,6 +61,16 @@ func (r repo) UpdateDinner(ctx context.Context, d *Dinner) error {
 	query := "UPDATE dinners SET yes = ?, no = ?, message_ids = ? WHERE id = ?"
 	query = r.db.Rebind(query)
 	_, err := r.db.ExecContext(ctx, query, pq.Array(&d.Yes), pq.Array(&d.No), &d.MessageIds, &d.ID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r repo) DeleteDinner(ctx context.Context, id int64) error {
+	query := "DELETE FROM dinners WHERE id = ?"
+	query = r.db.Rebind(query)
+	_, err := r.db.ExecContext(ctx, query, id)
 	if err != nil {
 		return err
 	}
