@@ -3,8 +3,10 @@ package dinner
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"slices"
 	"strconv"
 	"strings"
@@ -17,18 +19,25 @@ import (
 	"github.com/lib/pq"
 )
 
+type CronTrigger struct {
+	ChatId int64 `json:"chat_id"`
+}
+
 type Service interface {
 	HandleDinner(ctx context.Context, b *bot.Bot, update *models.Update)
 	HandleCallbackQuery(ctx context.Context, b *bot.Bot, update *models.Update)
+	CronTrigger(w http.ResponseWriter, r *http.Request)
 }
 
 type service struct {
+	bot      *bot.Bot
 	repo     Repo
 	chatRepo chat.Repo
 }
 
-func NewService(r Repo, cr chat.Repo) (Service, error) {
+func NewService(b *bot.Bot, r Repo, cr chat.Repo) (Service, error) {
 	return &service{
+		bot:      b,
 		repo:     r,
 		chatRepo: cr,
 	}, nil
@@ -68,13 +77,13 @@ func (s service) HandleDinner(ctx context.Context, b *bot.Bot, update *models.Up
 			slog.Error("unable to delete dinner")
 			b.SendMessage(ctx, &bot.SendMessageParams{
 				ChatID: update.Message.Chat.ID,
-				Text: "Sorry, I can't delete tonight's dinner",
+				Text:   "Sorry, I can't delete tonight's dinner",
 			})
 			return
 		}
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: update.Message.Chat.ID,
-			Text: "No more dinner for tonight!",
+			Text:   "No more dinner for tonight!",
 		})
 		return
 
@@ -126,9 +135,9 @@ func (s service) HandleCallbackQuery(ctx context.Context, b *bot.Bot, update *mo
 
 	// Send response
 	message, err := b.SendMessage(ctx, &bot.SendMessageParams{
-		ChatID: update.CallbackQuery.Message.Message.Chat.ID,
-		Text: s.parseDinnerMessage(dinner),
-		ParseMode: models.ParseModeHTML,
+		ChatID:      update.CallbackQuery.Message.Message.Chat.ID,
+		Text:        s.parseDinnerMessage(dinner),
+		ParseMode:   models.ParseModeHTML,
 		ReplyMarkup: s.getKeyboard(dinner.ID),
 	})
 	if err != nil {
@@ -142,6 +151,69 @@ func (s service) HandleCallbackQuery(ctx context.Context, b *bot.Bot, update *mo
 	if err := s.repo.UpdateDinner(ctx, dinner); err != nil {
 		slog.Error(err.Error())
 	}
+}
+
+func (s service) CronTrigger(w http.ResponseWriter, r *http.Request) {
+	// Decode request body
+	decoder := json.NewDecoder(r.Body)
+	var ct CronTrigger
+	err := decoder.Decode(&ct)
+	if err != nil {
+		slog.Error(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// Check if chat is valid
+	_, err = s.chatRepo.GetChatByID(r.Context(), ct.ChatId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			slog.Error("chat does not exist")
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		slog.Error(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// Create dinner
+	d := &Dinner{
+		ChatID:     ct.ChatId,
+		Date:       time.Now(),
+		Yes:        []string{},
+		No:         []string{},
+		MessageIds: pq.Int64Array{},
+	}
+	id, err := s.repo.InsertDinner(r.Context(), d)
+	if err != nil {
+		slog.Error(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// Send message
+	msg, err := s.bot.SendMessage(r.Context(), &bot.SendMessageParams{
+		ChatID:      ct.ChatId,
+		Text:        s.parseDinnerMessage(d),
+		ParseMode:   models.ParseModeHTML,
+		ReplyMarkup: s.getKeyboard(id),
+	})
+	if err != nil {
+		slog.Error(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// Update dinner with message ID
+	d.MessageIds = append(d.MessageIds, int64(msg.ID))
+	if err := s.repo.UpdateDinner(r.Context(), d); err != nil {
+		slog.Error(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func (s service) verifyChat(ctx context.Context, b *bot.Bot, update *models.Update) (*chat.Chat, error) {

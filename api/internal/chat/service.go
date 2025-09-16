@@ -5,14 +5,12 @@ import (
 	"database/sql"
 	"fmt"
 	"log/slog"
-	"strconv"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 )
 
 type Service interface {
-	DefaultHandler(ctx context.Context, b *bot.Bot, update *models.Update)
 	Start(ctx context.Context, b *bot.Bot, update *models.Update)
 	ReplyHello(ctx context.Context, b *bot.Bot, update *models.Update)
 }
@@ -23,21 +21,6 @@ type service struct {
 
 func NewService(r Repo) (Service, error) {
 	return &service{repo: r}, nil
-}
-
-func (s service) DefaultHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
-	if update.Message != nil {
-		slog.Warn(fmt.Sprintf("unhandled message with id: %s", strconv.Itoa(update.Message.ID)))
-	}
-	if update.CallbackQuery != nil {
-		slog.Warn(fmt.Sprintf("unhandled callback with id: %v", update.CallbackQuery.ID))
-
-		// Answer callback query first so that Telegram stops spamming updates
-		b.AnswerCallbackQuery(ctx, &bot.AnswerCallbackQueryParams{
-			CallbackQueryID: update.CallbackQuery.ID,
-			ShowAlert:       false,
-		})
-	}
 }
 
 func (s *service) Start(ctx context.Context, b *bot.Bot, update *models.Update) {

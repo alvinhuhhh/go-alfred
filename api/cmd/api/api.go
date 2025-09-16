@@ -10,12 +10,14 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"strconv"
 
 	"github.com/alvinhuhhh/go-alfred/internal/chat"
 	"github.com/alvinhuhhh/go-alfred/internal/dinner"
 	"github.com/alvinhuhhh/go-alfred/internal/handlers"
 	"github.com/alvinhuhhh/go-alfred/internal/middleware"
 	"github.com/go-telegram/bot"
+	"github.com/go-telegram/bot/models"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -42,7 +44,28 @@ func main() {
 		log.Fatal(err)
 	}
 
-	httpHandler, err := handlers.NewHttpHandler()
+	// Bot handler
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
+
+	opts := []bot.Option{
+		bot.WithDefaultHandler(func(ctx context.Context, b *bot.Bot, update *models.Update) {
+			if update.Message != nil {
+				slog.Warn(fmt.Sprintf("unhandled message with id: %s", strconv.Itoa(update.Message.ID)))
+			}
+			if update.CallbackQuery != nil {
+				slog.Warn(fmt.Sprintf("unhandled callback with id: %v", update.CallbackQuery.ID))
+
+				// Answer callback query first so that Telegram stops spamming updates
+				b.AnswerCallbackQuery(ctx, &bot.AnswerCallbackQueryParams{
+					CallbackQueryID: update.CallbackQuery.ID,
+					ShowAlert:       false,
+				})
+			}
+		}),
+		bot.WithMiddlewares(middleware.LogBotRequests),
+	}
+	b, err := bot.New(os.Getenv("BOT_TOKEN"), opts...)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -60,20 +83,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	dinnerService, err := dinner.NewService(dinnerRepo, chatRepo)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Bot handler
-	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
-	defer cancel()
-
-	opts := []bot.Option{
-		bot.WithDefaultHandler(chatService.DefaultHandler),
-		bot.WithMiddlewares(middleware.LogBotRequests),
-	}
-	b, err := bot.New(os.Getenv("BOT_TOKEN"), opts...)
+	dinnerService, err := dinner.NewService(b, dinnerRepo, chatRepo)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -90,13 +100,18 @@ func main() {
 	slog.Info("Bot webhook listener started")
 
 	// HTTP handler
+	httpHandler, err := handlers.NewHttpHandler()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	router := mux.NewRouter()
 	router.Use(middleware.SetAccessControlHeaders)
 	router.Use(middleware.LogRequests)
 
 	router.HandleFunc("/", b.WebhookHandler()).Methods(http.MethodGet, http.MethodPost, http.MethodPut, http.MethodOptions) // routes to Bot handlers
 	router.HandleFunc("/ping", httpHandler.Ping).Methods(http.MethodGet)
-	router.HandleFunc("/cron", httpHandler.CronTrigger).Methods(http.MethodGet)
+	router.HandleFunc("/cron", dinnerService.CronTrigger).Methods(http.MethodPost)
 
 	slog.Info(fmt.Sprintf("Alfred has started listening on port: %s", port))
 	http.ListenAndServe(fmt.Sprintf(":%s", port), router)
