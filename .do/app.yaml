@@ -25,7 +25,7 @@ services:
     value: EV[1:sw1qNrA3HHXc57ZwLjqd4rNJIgq/GXQ3:WoxGPgk9I9clF6UGaDFBmWMviAU8gq5tZ5SDsgv4EdNi8rPtH3nMf09T3650whLGPAEXDvtIEKEi6Ovr0do=]
   - key: DB_USER
     scope: RUN_AND_BUILD_TIME
-    value: postgres.inhapokrmngzktjvhlju
+    value: postgres
   - key: DB_PASSWORD
     scope: RUN_AND_BUILD_TIME
     type: SECRET
