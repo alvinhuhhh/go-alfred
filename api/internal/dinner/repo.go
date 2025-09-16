@@ -21,7 +21,7 @@ func NewRepo(db *sqlx.DB) (Repo, error) {
 }
 
 func (r repo) GetDinnerByDateAndChatId(ctx context.Context, chatId int64, date time.Time) (*Dinner, error) {
-	query := "SELECT chatId, date, yes, no, messageIds FROM dinner WHERE chatId = ? AND date = ?"
+	query := "SELECT chatId, date, yes, no, messageIds FROM dinners WHERE chatId = ? AND date = ?"
 	query = r.db.Rebind(query)
 	var d Dinner
 	err := r.db.GetContext(ctx, &d, query, chatId, date)
