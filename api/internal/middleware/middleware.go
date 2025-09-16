@@ -29,11 +29,12 @@ func SetAccessControlHeaders(next http.Handler) http.Handler {
 
 func LogBotRequests(next bot.HandlerFunc) bot.HandlerFunc {
 	return func(ctx context.Context, b *bot.Bot, update *models.Update) {
-		chatId := update.Message.Chat.ID
-		username := update.Message.From.Username
-		command := update.Message.Text
-
-		slog.Info(fmt.Sprintf("bot command %s received from %v in chat id %d", command, username, chatId))
+		if update.Message != nil {
+			slog.Info(fmt.Sprintf("bot command %s received from %v in chat id %d", update.Message.Text, update.Message.From.Username, update.Message.Chat.ID))
+		}
+		if update.CallbackQuery != nil {
+			slog.Info(fmt.Sprintf("bot callback %s received from %v", update.CallbackQuery.Data, update.CallbackQuery.From.Username))
+		}
 		next(ctx, b, update)
 	}
 }

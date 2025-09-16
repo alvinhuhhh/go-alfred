@@ -54,14 +54,6 @@ func (s service) HandleDinner(ctx context.Context, b *bot.Bot, update *models.Up
 		})
 		return
 
-	case "/joindinner":
-		slog.Info("Handle joindinner")
-		return
-
-	case "/leavedinner":
-		slog.Info("Handle leavedinner")
-		return
-
 	case "/enddinner":
 		return
 
@@ -76,7 +68,21 @@ func (s service) HandleCallbackQuery(ctx context.Context, b *bot.Bot, update *mo
 		CallbackQueryID: update.CallbackQuery.ID,
 		ShowAlert:       false,
 	})
-	s.HandleDinner(ctx, b, update)
+	chatId := update.CallbackQuery.Message.Message.Chat.ID
+	callbackData := update.CallbackQuery.Data
+
+	switch callbackData {
+	case "yes":
+		slog.Info("received yes from id: %v", chatId)
+		return
+
+	case "no":
+		slog.Info("received no from id: %v", chatId)
+		return
+
+	default:
+		return
+	}
 }
 
 func (s service) verifyChat(ctx context.Context, b *bot.Bot, update *models.Update) (*chat.Chat, error) {
@@ -150,8 +156,8 @@ func (s service) getKeyboard() *models.InlineKeyboardMarkup {
 	return &models.InlineKeyboardMarkup{
 		InlineKeyboard: [][]models.InlineKeyboardButton{
 			{
-				{Text: "Join Dinner", CallbackData: "Yes"},
-				{Text: "Leave Dinner", CallbackData: "No"},
+				{Text: "Join Dinner", CallbackData: "yes"},
+				{Text: "Leave Dinner", CallbackData: "no"},
 			},
 		},
 	}
@@ -161,5 +167,5 @@ func (s service) parseDinnerMessage(d *Dinner) string {
 	date := d.Date
 	yes := strings.Join(d.Yes, "\n")
 	no := strings.Join(d.No, "\n")
-	return fmt.Sprintf("\n<b>Dinner tonight:</b>\nDate: %s\n\n<u>YES:</u>\n%s\n<u>NO:</u>\n%s\n", date.Format("02/01/2006"), yes, no)
+	return fmt.Sprintf("\n<b>Dinner tonight:</b>\nDate: %s\n\n<u>YES:</u>\n%s\n\n<u>NO:</u>\n%s\n\n", date.Format("02/01/2006"), yes, no)
 }
