@@ -24,7 +24,7 @@ func (r repo) GetDinnerByDateAndChatId(ctx context.Context, chatId int64, date t
 	query := "SELECT chat_id, date, yes, no, message_ids FROM dinners WHERE chat_id = ? AND date = ?"
 	query = r.db.Rebind(query)
 	var d Dinner
-	err := r.db.GetContext(ctx, &d, query, chatId, date.Format("YYYY-MM-DD"))
+	err := r.db.GetContext(ctx, &d, query, chatId, date.Format("2006-01-02"))
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func (r repo) InsertDinner(ctx context.Context, dinner *Dinner) (int64, error) {
 	query := "INSERT INTO dinners(chat_id, date, yes, no, message_ids) VALUES (?,?,?,?,?) RETURNING id"
 	query = r.db.Rebind(query)
 	var id int64
-	err := r.db.QueryRowContext(ctx, query, &dinner.ChatID, dinner.Date.Format("YYYY-MM-DD"), &dinner.Yes, &dinner.No, &dinner.MessageIds).Scan(&id)
+	err := r.db.QueryRowContext(ctx, query, &dinner.ChatID, dinner.Date.Format("2006-01-02"), &dinner.Yes, &dinner.No, &dinner.MessageIds).Scan(&id)
 	if err != nil {
 		return -1, err
 	}
