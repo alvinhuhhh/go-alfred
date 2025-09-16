@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log/slog"
+	"strings"
 	"time"
 
 	"github.com/alvinhuhhh/go-alfred/internal/chat"
@@ -158,12 +159,7 @@ func (s service) getKeyboard() *models.InlineKeyboardMarkup {
 
 func (s service) parseDinnerMessage(d *Dinner) string {
 	date := d.Date
-	var yes, no string
-	for _, v := range d.Yes {
-		yes += fmt.Sprintf("%s\n", v)
-	}
-	for _, v := range d.No {
-		no += fmt.Sprintf("%s\n", v)
-	}
-	return fmt.Sprintf("\n<b>Dinner tonight:</b>\nDate: %s\n\n<u>YES:</u>\n%s\n\n<u>NO:</u>\n%s", date.Format("02/01/2006"), yes, no)
+	yes := strings.Join(d.Yes, "\n")
+	no := strings.Join(d.No, "\n")
+	return fmt.Sprintf("\n<b>Dinner tonight:</b>\nDate: %s\n\n<u>YES:</u>\n%s\n<u>NO:</u>\n%s\n", date.Format("02/01/2006"), yes, no)
 }
