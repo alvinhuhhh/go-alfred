@@ -117,13 +117,17 @@ func (s service) HandleCallbackQuery(ctx context.Context, b *bot.Bot, update *mo
 
 	switch split[0] {
 	case "joindinner":
-		dinner.Yes = append(dinner.Yes, name)
+		if !slices.Contains(dinner.Yes, name) {
+			dinner.Yes = append(dinner.Yes, name)
+		}
 		if slices.Contains(dinner.No, name) {
 			dinner.No = util.Remove(dinner.No, name)
 		}
 
 	case "leavedinner":
-		dinner.No = append(dinner.No, name)
+		if !slices.Contains(dinner.No, name) {
+			dinner.No = append(dinner.No, name)
+		}
 		if slices.Contains(dinner.Yes, name) {
 			dinner.Yes = util.Remove(dinner.Yes, name)
 		}
