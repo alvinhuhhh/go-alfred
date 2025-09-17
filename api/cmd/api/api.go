@@ -106,12 +106,17 @@ func main() {
 	}
 
 	router := mux.NewRouter()
-	router.Use(middleware.SetAccessControlHeaders)
-	router.Use(middleware.LogRequests)
+	
+	api := router.PathPrefix("/api").Subrouter()
+	api.Use(middleware.SetAccessControlHeaders)
+	api.Use(middleware.LogRequests)
+	
+	api.HandleFunc("/", b.WebhookHandler()).Methods(http.MethodGet, http.MethodPost, http.MethodPut, http.MethodOptions) // routes to Bot handlers
+	api.HandleFunc("/ping", httpHandler.Ping).Methods(http.MethodGet)
+	api.HandleFunc("/cron", dinnerService.CronTrigger).Methods(http.MethodPost)
 
-	router.HandleFunc("/", b.WebhookHandler()).Methods(http.MethodGet, http.MethodPost, http.MethodPut, http.MethodOptions) // routes to Bot handlers
-	router.HandleFunc("/ping", httpHandler.Ping).Methods(http.MethodGet)
-	router.HandleFunc("/cron", dinnerService.CronTrigger).Methods(http.MethodPost)
+	web := router.NewRoute().Subrouter()
+	web.HandleFunc("/", httpHandler.Serve).Methods(http.MethodGet)
 
 	slog.Info(fmt.Sprintf("Alfred has started listening on port: %s", port))
 	http.ListenAndServe(fmt.Sprintf(":%s", port), router)

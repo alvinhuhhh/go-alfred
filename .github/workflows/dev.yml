@@ -1,11 +1,9 @@
-name: API Image Build, Publish and Deploy DEV to DigitalOcean
+name: Image Build, Publish and Deploy DEV to DigitalOcean
 
 on: 
   push:
     branches:
       - main
-    paths:
-      - 'api/**'
   workflow_dispatch:
 
 permissions:
@@ -32,9 +30,8 @@ jobs:
       - name: Build and push the image
         uses: docker/build-push-action@v6
         with:
-          context: ./api
           push: true
-          tags: ghcr.io/${{ github.repository }}-api:latest
+          tags: ghcr.io/${{ github.repository }}:latest
 
       - name: Deploy to DigitalOcean
         uses: digitalocean/app_action/deploy@v2

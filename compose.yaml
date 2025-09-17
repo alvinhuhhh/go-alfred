@@ -16,12 +16,12 @@ services:
       timeout: 5s
       retries: 5
   
-  api:
-    image: alfred-api
+  app:
+    image: go-alfred
     build:
-      context: ./api
+      context: ./
     volumes:
-      - ./api:/app
+      - ./:/app
     restart: always
     environment:
       - PORT=8080
@@ -38,15 +38,3 @@ services:
         condition: service_healthy
     links:
       - db
-
-  ui:
-    image: alfred-ui
-    build:
-      context: ./ui
-    volumes:
-      - ./ui:/app
-    restart: always
-    ports:
-      - 3000:3000
-    links:
-      - api
