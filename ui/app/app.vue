@@ -3,6 +3,11 @@ import { retrieveLaunchParams } from "@telegram-apps/sdk";
 
 const { initDataRaw, initData } = retrieveLaunchParams();
 const chatId = ref("unknown");
+const hash = window.location.hash.slice(1)
+console.log(hash)
+
+const params = new URLSearchParams(hash)
+console.log(params.get('tgWebAppData'))
 
 console.log(initDataRaw, initData);
 </script>
