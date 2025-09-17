@@ -117,7 +117,7 @@ func main() {
 
 	web := router.NewRoute().Subrouter()
 	web.Use(middleware.LogRequests)
-	web.HandleFunc("/", httpHandler.Serve).Methods(http.MethodGet)
+	web.PathPrefix("/").HandlerFunc(httpHandler.Serve)
 
 	slog.Info(fmt.Sprintf("Alfred has started listening on port: %s", port))
 	http.ListenAndServe(fmt.Sprintf(":%s", port), router)
