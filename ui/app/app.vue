@@ -1,15 +1,16 @@
 <script setup>
-import { retrieveLaunchParams } from "@telegram-apps/sdk";
+import { init, retrieveLaunchParams } from "@telegram-apps/sdk-vue";
+init();
+const { initDataRaw, initData, tgWebAppData } = retrieveLaunchParams();
+console.log(initDataRaw);
+console.log(initData);
+console.log(tgWebAppData);
 
-const { initDataRaw, initData } = retrieveLaunchParams();
 const chatId = ref("unknown");
-const hash = window.location.hash.slice(1)
-console.log(hash)
 
-const params = new URLSearchParams(hash)
-console.log(params.get('tgWebAppData'))
-
-console.log(initDataRaw, initData);
+if (tgWebAppData) {
+  chatId.value = tgWebAppData.chat.id;
+}
 </script>
 
 <template>
