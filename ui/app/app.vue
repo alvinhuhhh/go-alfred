@@ -1,16 +1,27 @@
 <script setup>
 import { init, retrieveLaunchParams } from "@telegram-apps/sdk-vue";
 init();
-const { initDataRaw, initData, tgWebAppData } = retrieveLaunchParams();
-console.log(initDataRaw);
-console.log(initData);
-console.log(tgWebAppData);
 
 const chatId = ref("unknown");
 
-if (tgWebAppData) {
-  chatId.value = tgWebAppData.chat.id;
+function setChatId() {
+  const { tgWebAppData } = retrieveLaunchParams();
+  console.log(tgWebAppData);
+
+  if (!tgWebAppData) {
+    return;
+  }
+
+  if (tgWebAppData.chat) {
+    chatId.value = tgWebAppData.chat.id;
+  } else if (tgWebAppData.user) {
+    chatId.value = tgWebAppData.user.id;
+  }
 }
+
+onMounted(() => {
+  setChatId();
+});
 </script>
 
 <template>
