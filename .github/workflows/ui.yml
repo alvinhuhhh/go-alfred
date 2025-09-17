@@ -1,11 +1,11 @@
-name: API Image Build, Publish and Deploy DEV to DigitalOcean
+name: UI Image Build, Publish and Deploy to fly.io
 
-on: 
+on:
   push:
     branches:
       - main
     paths:
-      - 'api/**'
+      - 'ui/**'
   workflow_dispatch:
 
 permissions:
@@ -32,11 +32,14 @@ jobs:
       - name: Build and push the image
         uses: docker/build-push-action@v6
         with:
-          context: ./api
+          context: ./ui
           push: true
-          tags: ghcr.io/${{ github.repository }}-api:latest
+          tags: ghcr.io/${{github.repository}}-ui:latest
 
-      - name: Deploy to DigitalOcean
-        uses: digitalocean/app_action/deploy@v2
-        with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      - name: Setup flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to fly.io
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

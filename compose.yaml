@@ -38,3 +38,15 @@ services:
         condition: service_healthy
     links:
       - db
+
+  ui:
+    image: alfred-ui
+    build:
+      context: ./ui
+    volumes:
+      - ./ui:/app
+    restart: always
+    ports:
+      - 3000:3000
+    links:
+      - api
