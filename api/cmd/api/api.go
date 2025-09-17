@@ -116,6 +116,7 @@ func main() {
 	api.HandleFunc("/cron", dinnerService.CronTrigger).Methods(http.MethodPost)
 
 	web := router.NewRoute().Subrouter()
+	web.Use(middleware.LogRequests)
 	web.HandleFunc("/", httpHandler.Serve).Methods(http.MethodGet)
 
 	slog.Info(fmt.Sprintf("Alfred has started listening on port: %s", port))
