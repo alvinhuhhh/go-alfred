@@ -149,7 +149,7 @@ func (s service) HandleCallbackQuery(ctx context.Context, b *bot.Bot, update *mo
 	}
 
 	// Append message ID
-	dinner.MessageIds = append(dinner.MessageIds, int64(message.ID))
+	dinner.MessageIds = s.appendMessageId(dinner.MessageIds, int64(message.ID))
 
 	// Insert db
 	if err := s.repo.UpdateDinner(ctx, dinner); err != nil {
@@ -224,7 +224,7 @@ func (s service) CronTrigger(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Update dinner with message ID
-	d.MessageIds = append(d.MessageIds, int64(msg.ID))
+	d.MessageIds = s.appendMessageId(d.MessageIds, int64(msg.ID))
 	if err := s.repo.UpdateDinner(r.Context(), d); err != nil {
 		slog.Error(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -317,4 +317,13 @@ func (s service) parseDinnerMessage(d *Dinner) string {
 	yes := strings.Join(d.Yes, "\n")
 	no := strings.Join(d.No, "\n")
 	return fmt.Sprintf("\n<b>Dinner tonight:</b>\nDate: %s\n\n<u>YES:</u>\n%s\n\n<u>NO:</u>\n%s\n\n", date.Format("02/01/2006"), yes, no)
+}
+
+func (s service) appendMessageId(arr pq.Int64Array, id int64) pq.Int64Array {
+	// Cap array length at 1000 elements
+	arr = append(arr, id)
+	if len(arr) > 1000 {
+		arr = arr[1:]
+	}
+	return arr
 }
