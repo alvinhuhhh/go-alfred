@@ -111,7 +111,7 @@ func main() {
 	api.Use(middleware.SetAccessControlHeaders)
 	api.Use(middleware.LogRequests)
 	
-	api.HandleFunc("/", b.WebhookHandler()).Methods(http.MethodGet, http.MethodPost, http.MethodPut, http.MethodOptions) // routes to Bot handlers
+	api.HandleFunc("/webhook", b.WebhookHandler()).Methods(http.MethodGet, http.MethodPost, http.MethodPut, http.MethodOptions) // routes to Bot handlers
 	api.HandleFunc("/ping", httpHandler.Ping).Methods(http.MethodGet)
 	api.HandleFunc("/cron", dinnerService.CronTrigger).Methods(http.MethodPost)
 
