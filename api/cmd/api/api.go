@@ -65,6 +65,9 @@ func main() {
 		}),
 		bot.WithMiddlewares(middleware.LogBotRequests),
 	}
+	if isTestServer() {
+		opts = append(opts, bot.UseTestEnvironment())
+	}
 	b, err := bot.New(os.Getenv("BOT_TOKEN"), opts...)
 	if err != nil {
 		log.Fatal(err)
@@ -129,6 +132,11 @@ func getPort() (string, error) {
 		return "", fmt.Errorf("unable to get PORT from env")
 	}
 	return port, nil
+}
+
+func isTestServer() bool {
+	t := os.Getenv("TELEGRAM_TEST_SERVER")
+	return t == "1"
 }
 
 func getDB() (*sqlx.DB, error) {

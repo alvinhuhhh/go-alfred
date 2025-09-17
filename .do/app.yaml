@@ -1,12 +1,39 @@
 alerts:
 - rule: DEPLOYMENT_FAILED
 - rule: DOMAIN_FAILED
+envs:
+- key: PORT
+  scope: RUN_AND_BUILD_TIME
+  value: "8080"
+- key: BOT_TOKEN
+  scope: RUN_AND_BUILD_TIME
+  type: SECRET
+  value: EV[1:muzPrV37YQTRQ7mMLbUvUPbXdpHca6J+:oXIX+ydyZWnnuJBDeuZv0CJqDZKJ8W+wi0Cah4SvWZ/saZJoHSNF9CxZkLq4nXy7BqBm3bRj8tup2jFS0VY=]
+- key: DB_USER
+  scope: RUN_AND_BUILD_TIME
+  value: postgres
+- key: DB_PASSWORD
+  scope: RUN_AND_BUILD_TIME
+  type: SECRET
+  value: EV[1:9jVq7uWDwTIj94nnU5Gw8FXbUymKdPBj:FgJXjvqWb9LDQUlNtf4o5QijCaIgYU3QxkwV83dOCPQ=]
+- key: DB_HOST
+  scope: RUN_AND_BUILD_TIME
+  value: db.inhapokrmngzktjvhlju.supabase.co
+- key: DB_PORT
+  scope: RUN_AND_BUILD_TIME
+  value: "5432"
+- key: DB_NAME
+  scope: RUN_AND_BUILD_TIME
+  value: postgres
+- key: TELEGRAM_TEST_SERVER
+  scope: RUN_AND_BUILD_TIME
+  value: "1"
 features:
 - buildpack-stack=ubuntu-22
 ingress:
   rules:
   - component:
-      name: go-alfred-dev
+      name: alvinhuhhh-go-alfred
     match:
       authority:
         exact: ""
@@ -15,31 +42,7 @@ ingress:
 name: go-alfred-dev
 region: sgp
 services:
-- envs:
-  - key: PORT
-    scope: RUN_AND_BUILD_TIME
-    value: "8080"
-  - key: BOT_TOKEN
-    scope: RUN_AND_BUILD_TIME
-    type: SECRET
-    value: EV[1:sw1qNrA3HHXc57ZwLjqd4rNJIgq/GXQ3:WoxGPgk9I9clF6UGaDFBmWMviAU8gq5tZ5SDsgv4EdNi8rPtH3nMf09T3650whLGPAEXDvtIEKEi6Ovr0do=]
-  - key: DB_USER
-    scope: RUN_AND_BUILD_TIME
-    value: postgres
-  - key: DB_PASSWORD
-    scope: RUN_AND_BUILD_TIME
-    type: SECRET
-    value: EV[1:ZhNQaMfjUx779LNVNUZcgS17ZCBw+LjH:7cCgiaWQcHIpOC+MS5GeIJHReEjD/8YhkhxSig3aBYs=]
-  - key: DB_HOST
-    scope: RUN_AND_BUILD_TIME
-    value: db.inhapokrmngzktjvhlju.supabase.co
-  - key: DB_PORT
-    scope: RUN_AND_BUILD_TIME
-    value: "5432"
-  - key: DB_NAME
-    scope: RUN_AND_BUILD_TIME
-    value: postgres
-  http_port: 8080
+- http_port: 8080
   image:
     registry: alvinhuhhh
     registry_type: GHCR
@@ -47,4 +50,4 @@ services:
     tag: latest
   instance_count: 1
   instance_size_slug: apps-s-1vcpu-0.5gb
-  name: go-alfred-dev
+  name: alvinhuhhh-go-alfred
