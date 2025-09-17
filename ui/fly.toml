@@ -7,6 +7,7 @@ app = 'go-alfred-ui'
 primary_region = 'sin'
 
 [build]
+  image = "ghcr.io/alvinhuhhh/go-alfred-ui:latest"
 
 [http_service]
   internal_port = 3000
