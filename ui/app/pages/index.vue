@@ -8,6 +8,10 @@ import {
   User,
 } from "lucide-vue-next";
 
+if (checkTelegramEnvironment()) {
+  navigateTo("/telegram");
+}
+
 const features = [
   {
     title: "Secure Notebook",
@@ -25,8 +29,7 @@ const features = [
   },
   {
     title: "Advanced Features",
-    description:
-      "Coming soon: More advanced tools to simplify your life",
+    description: "Coming soon: More advanced tools to simplify your life",
     icon: Sparkles,
     color:
       "bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400",
@@ -36,135 +39,134 @@ const features = [
 function handleGetStarted() {
   console.log("get-started");
 }
-
-let tgEnv = checkTelegramEnvironment();
-console.debug(tgEnv);
 </script>
 
 <template>
-  <div class="min-h-screen max-w-4xl mx-auto mb-12 bg-background">
-    <!-- Hero Section -->
-    <div class="max-w-4xl mx-auto px-4 py-16">
+  <div class="min-h-screen bg-background">
+    <div class="max-w-4xl mx-auto">
+      <!-- Hero Section -->
+      <div class="max-w-4xl mx-auto px-4 py-16">
+        <div class="text-center mb-16">
+          <div
+            class="w-20 h-20 bg-primary rounded-full mx-auto mb-6 flex items-center justify-center"
+          >
+            <User class="w-10 h-10 text-primary-foreground" />
+          </div>
+          <h1 class="text-4xl md:text-6xl font-medium text-foreground mb-4">
+            Meet Alfred
+          </h1>
+          <p class="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Your personal administrative assistant, powered by Telegram
+          </p>
+          <div
+            class="flex flex-col sm:flex-row gap-4 justify-center items-center"
+          >
+            <Button
+              @click="handleGetStarted"
+              size="lg"
+              class="flex items-center space-x-2"
+            >
+              <MessageSquare class="w-5 h-5" />
+              <span>Start with Telegram</span>
+              <ArrowRight class="w-4 h-4" />
+            </Button>
+            <Badge variant="secondary" class="flex items-center space-x-1">
+              <Smartphone class="w-3 h-3" />
+              <span>Telegram Mini App</span>
+            </Badge>
+          </div>
+        </div>
+      </div>
+
+      <!-- Features Grid -->
+      <div class="grid md:grid-cols-3 gap-8 mb-16">
+        <Card
+          v-for="feature in features"
+          :key="feature.title"
+          class="p-6 text-center"
+        >
+          <div
+            class="w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-4"
+            :class="feature.color"
+          >
+            <component :is="feature.icon" />
+          </div>
+          <h3 class="text-xl font-medium text-foreground mb-3">
+            {{ feature.title }}
+          </h3>
+          <p class="text-muted-foreground">{{ feature.description }}</p>
+        </Card>
+      </div>
+
+      <!-- How it works -->
       <div class="text-center mb-16">
-        <div
-          class="w-20 h-20 bg-primary rounded-full mx-auto mb-6 flex items-center justify-center"
-        >
-          <User class="w-10 h-10 text-primary-foreground" />
-        </div>
-        <h1 class="text-4xl md:text-6xl font-medium text-foreground mb-4">
-          Meet Alfred
-        </h1>
-        <p class="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-          Your personal administrative assistant, powered by Telegram
-        </p>
-        <div
-          class="flex flex-col sm:flex-row gap-4 justify-center items-center"
-        >
-          <Button
-            @click="handleGetStarted"
-            size="lg"
-            class="flex items-center space-x-2"
-          >
-            <MessageSquare class="w-5 h-5" />
-            <span>Start with Telegram</span>
-            <ArrowRight class="w-4 h-4" />
-          </Button>
-          <Badge variant="secondary" class="flex items-center space-x-1">
-            <Smartphone class="w-3 h-3" />
-            <span>Telegram Mini App</span>
-          </Badge>
+        <h2 class="text-3xl font-medium text-foreground mb-8">
+          How Alfred Works
+        </h2>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="space-y-4">
+            <div
+              class="w-12 h-12 bg-blue-50 dark:bg-blue-950 rounded-full flex items-center justify-center mx-auto"
+            >
+              <span class="text-blue-600 dark:text-blue-400 font-medium"
+                >1</span
+              >
+            </div>
+            <h4 class="font-medium text-foreground">Add to Telegram</h4>
+            <p class="text-muted-foreground">
+              Start a conversation with Alfred on Telegram or add to group
+            </p>
+          </div>
+          <div class="space-y-4">
+            <div
+              class="w-12 h-12 bg-green-50 dark:bg-green-950 rounded-full flex items-center justify-center mx-auto"
+            >
+              <span class="text-green-600 dark:text-green-400 font-medium"
+                >2</span
+              >
+            </div>
+            <h4 class="font-medium text-foreground">Configure Settings</h4>
+            <p class="text-muted-foreground">Set up your preferences</p>
+          </div>
+          <div class="space-y-4">
+            <div
+              class="w-12 h-12 bg-purple-50 dark:bg-purple-950 rounded-full flex items-center justify-center mx-auto"
+            >
+              <span class="text-purple-600 dark:text-purple-400 font-medium"
+                >3</span
+              >
+            </div>
+            <h4 class="font-medium text-foreground">Enjoy Automation</h4>
+            <p class="text-muted-foreground">
+              Let Alfred handle your chat's administrative tasks
+            </p>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Features Grid -->
-    <div class="grid md:grid-cols-3 gap-8 mb-16">
-      <Card
-        v-for="feature in features"
-        :key="feature.title"
-        class="p-6 text-center"
-      >
-        <div
-          class="w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-4"
-          :class="feature.color"
-        >
-          <component :is="feature.icon" />
-        </div>
-        <h3 class="text-xl font-medium text-foreground mb-3">
-          {{ feature.title }}
+      <!-- CTA Section -->
+      <Card class="p-8 text-center bg-muted/50">
+        <h3 class="text-2xl font-medium text-foreground mb-4">
+          Ready to Get Started?
         </h3>
-        <p class="text-muted-foreground">{{ feature.description }}</p>
+        <p class="text-muted-foreground mb-6">
+          Your simple Telegram assistant for dinner plans and shared notes.
+        </p>
+        <Button
+          @click="handleGetStarted"
+          size="lg"
+          class="flex items-center space-x-2 mx-auto"
+        >
+          <MessageSquare class="w-5 h-5" />
+          <span>Open in Telegram</span>
+          <ArrowRight class="w-4 h-4" />
+        </Button>
       </Card>
-    </div>
 
-    <!-- How it works -->
-    <div class="text-center mb-16">
-      <h2 class="text-3xl font-medium text-foreground mb-8">
-        How Alfred Works
-      </h2>
-      <div class="grid md:grid-cols-3 gap-8">
-        <div class="space-y-4">
-          <div
-            class="w-12 h-12 bg-blue-50 dark:bg-blue-950 rounded-full flex items-center justify-center mx-auto"
-          >
-            <span class="text-blue-600 dark:text-blue-400 font-medium">1</span>
-          </div>
-          <h4 class="font-medium text-foreground">Add to Telegram</h4>
-          <p class="text-muted-foreground">
-            Start a conversation with Alfred on Telegram or add to group
-          </p>
-        </div>
-        <div class="space-y-4">
-          <div
-            class="w-12 h-12 bg-green-50 dark:bg-green-950 rounded-full flex items-center justify-center mx-auto"
-          >
-            <span class="text-green-600 dark:text-green-400 font-medium"
-              >2</span
-            >
-          </div>
-          <h4 class="font-medium text-foreground">Configure Settings</h4>
-          <p class="text-muted-foreground">
-            Set up your preferences
-          </p>
-        </div>
-        <div class="space-y-4">
-          <div
-            class="w-12 h-12 bg-purple-50 dark:bg-purple-950 rounded-full flex items-center justify-center mx-auto"
-          >
-            <span class="text-purple-600 dark:text-purple-400 font-medium"
-              >3</span
-            >
-          </div>
-          <h4 class="font-medium text-foreground">Enjoy Automation</h4>
-          <p class="text-muted-foreground">
-            Let Alfred handle your chat's administrative tasks
-          </p>
-        </div>
+      <!-- Footer -->
+      <div class="text-center py-16 text-muted-foreground">
+        <p>Alfred v1.0 — Your personal butler, right in your chats.</p>
       </div>
-    </div>
-
-    <!-- CTA Section -->
-    <Card class="p-8 text-center bg-muted/50">
-      <h3 class="text-2xl font-medium text-foreground mb-4">
-        Ready to Get Started?
-      </h3>
-      <p class="text-muted-foreground mb-6">
-        Your simple Telegram assistant for dinner plans and shared notes.
-      </p>
-      <Button
-        @click="handleGetStarted"
-        size="lg"
-        class="flex items-center space-x-2 mx-auto"
-      >
-        <MessageSquare class="w-5 h-5" />
-        <span>Open in Telegram</span>
-        <ArrowRight class="w-4 h-4" />
-      </Button>
-    </Card>
-
-    <!-- Footer -->
-    <div class="text-center mt-16 text-muted-foreground">
-      <p>Alfred v1.0 — A lightweight assistant, right in your chats.</p>
     </div>
   </div>
 </template>
