@@ -8,7 +8,9 @@ import {
   User,
 } from "lucide-vue-next";
 
-if (checkTelegramEnvironment()) {
+const appConfig = useAppConfig();
+if (!appConfig.devMode && checkTelegramEnvironment()) {
+  // Redirect to /telegram if opened in Telegram
   navigateTo("/telegram");
 }
 

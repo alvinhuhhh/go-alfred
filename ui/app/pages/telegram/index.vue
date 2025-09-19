@@ -1,7 +1,9 @@
 <script setup>
 import { User, BookOpen, Settings, Sparkles } from "lucide-vue-next";
 
-if (!checkTelegramEnvironment()) {
+const appConfig = useAppConfig()
+if (!appConfig.devMode && !checkTelegramEnvironment()) {
+  // If not opened in Telegram redirect to Landing
   navigateTo("/");
 }
 

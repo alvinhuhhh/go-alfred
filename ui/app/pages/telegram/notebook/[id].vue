@@ -9,10 +9,6 @@ import {
   Check,
 } from "lucide-vue-next";
 
-if (!checkTelegramEnvironment()) {
-  navigateTo("/");
-}
-
 const notes = ref([
   {
     id: 1,
