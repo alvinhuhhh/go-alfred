@@ -9,7 +9,10 @@ import {
   Check,
 } from "lucide-vue-next";
 
-const isDialogOpen = ref(true);
+const isDialogOpen = ref(false);
+const isToastOpen = ref(false);
+const toastStatus = ref("success");
+const toastMessage = ref("");
 
 const notes = ref([
   {
@@ -51,12 +54,18 @@ async function copyValue(id) {
     const text = note.value;
     await navigator.clipboard.writeText(text);
     note.copyIcon = Check;
+
+    isToastOpen.value = true;
+    toastStatus.value = "success";
+    toastMessage.value = "Copied!";
+
     setTimeout(() => {
       note.copyIcon = Copy;
     }, 1500); // Reset feedback after 1.5 seconds
   } catch (err) {
     console.error("Failed to copy text: ", err);
-    // Handle error, e.g., show an error message to the user
+    toastStatus.value = "error";
+    toastMessage.value = "Error copying to clipboard";
   }
 }
 </script>
@@ -75,7 +84,7 @@ async function copyValue(id) {
         </div>
 
         <Dialog :open="isDialogOpen">
-          <DialogTrigger asChild>
+          <DialogTrigger as-child>
             <Button
               @click="setIsDialogOpen"
               size="sm"
@@ -169,5 +178,12 @@ async function copyValue(id) {
         </div>
       </div>
     </div>
+
+    <ToastRoot v-model:open="isToastOpen">
+      <ToastDescription :status="toastStatus">{{
+        toastMessage
+      }}</ToastDescription>
+    </ToastRoot>
+    <ToastViewport />
   </div>
 </template>

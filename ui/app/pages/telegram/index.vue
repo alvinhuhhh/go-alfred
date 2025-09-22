@@ -1,7 +1,7 @@
 <script setup>
 import { User, BookOpen, Settings, Sparkles } from "lucide-vue-next";
 
-const appConfig = useAppConfig()
+const appConfig = useAppConfig();
 if (!appConfig.devMode && !checkTelegramEnvironment()) {
   // If not opened in Telegram redirect to Landing
   navigateTo("/");
@@ -89,7 +89,9 @@ function handleFeatureClick(id) {
             </div>
             <div class="flex-1 text-left">
               <div class="flex items-center space-x-2 mb-1">
-                <h3 class="font-medium text-foreground">{{ feature.title }}</h3>
+                <h3 class="font-medium text-foreground">
+                  {{ feature.title }}
+                </h3>
                 <Badge
                   v-if="!feature.available"
                   variant="secondary"
