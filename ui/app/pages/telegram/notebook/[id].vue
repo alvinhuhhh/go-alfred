@@ -9,6 +9,8 @@ import {
   Check,
 } from "lucide-vue-next";
 
+const isDialogOpen = ref(true);
+
 const notes = ref([
   {
     id: 1,
@@ -37,6 +39,10 @@ function formatValue(value, isVisible) {
 function toggleValueVisibility(id) {
   const note = notes.value.find((n) => n.id === id);
   note.isVisible = !note.isVisible;
+}
+
+function setIsDialogOpen() {
+  isDialogOpen.value = !isDialogOpen.value;
 }
 
 async function copyValue(id) {
@@ -68,39 +74,42 @@ async function copyValue(id) {
           <h1 class="text-xl font-medium">Notebook</h1>
         </div>
 
-        <Dialog open="{isDialogOpen}" onOpenChange="{setIsDialogOpen}">
+        <Dialog :open="isDialogOpen">
           <DialogTrigger asChild>
-            <Button size="sm" class="flex items-center space-x-2">
+            <Button
+              @click="setIsDialogOpen"
+              size="sm"
+              class="flex items-center space-x-2"
+            >
               <Plus class="w-4 h-4" />
               <span>Add</span>
             </Button>
           </DialogTrigger>
-          <DialogContent class="w-[90vw] max-w-md">
+          <DialogContent
+            @dialog-close="setIsDialogOpen"
+            class="w-[90vw] max-w-md"
+          >
             <DialogHeader>
               <DialogTitle>Add New Note</DialogTitle>
             </DialogHeader>
             <div class="space-y-4 pt-4">
               <div>
                 <Label htmlFor="key">Key</Label>
-                <Input
-                  id="key"
-                  placeholder="e.g., WiFi Password"
-                  value="{newKey}"
-                />
+                <Input id="key" placeholder="e.g., WiFi Password" />
               </div>
               <div>
                 <Label htmlFor="value">Value</Label>
-                <Input
-                  id="value"
-                  placeholder="e.g., MyPassword123"
-                  value="{newValue}"
-                />
+                <Input id="value" placeholder="e.g., MyPassword123" />
               </div>
               <div class="flex space-x-2 pt-2">
-                <Button onClick="{handleAddNote}" class="flex-1">
-                  Add Note
+                <Button class="flex-1"> Add Note </Button>
+                <Button
+                  variant="outline"
+                  @click="setIsDialogOpen"
+                  class="flex-1"
+                >
+                  Cancel
                 </Button>
-                <Button variant="outline" class="flex-1"> Cancel </Button>
               </div>
             </div>
           </DialogContent>
