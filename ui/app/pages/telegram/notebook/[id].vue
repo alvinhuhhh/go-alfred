@@ -96,7 +96,6 @@ async function copyValue(id) {
           </DialogTrigger>
           <DialogContent
             @dialog-close="setIsDialogOpen"
-            class="w-[90vw] max-w-md"
           >
             <DialogHeader>
               <DialogTitle>Add New Note</DialogTitle>

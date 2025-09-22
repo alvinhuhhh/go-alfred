@@ -1,10 +1,10 @@
 <script setup>
 import { ArrowLeft, Moon, Sun, MessageSquare, Clock } from "lucide-vue-next";
 
-const theme = "light";
 const scheduleEnabled = ref(true);
 const scheduleTime = ref(null);
 const scheduleFrequency = ref(null);
+const isDarkMode = ref(getTheme() === "dark");
 
 const timeOptions = [
   { value: "06:00", label: "6:00 AM" },
@@ -41,6 +41,10 @@ const frequencyOptions = [
 
 function back() {
   return navigateTo("/telegram");
+}
+
+function toggleTheme() {
+  setTheme(getTheme() === "light" ? "dark" : "light");
 }
 </script>
 
@@ -81,18 +85,14 @@ function back() {
             <!-- Enable/Disable Toggle -->
             <div class="flex items-center justify-between">
               <div>
-                <Label htmlFor="schedule-enabled" class="text-base"
+                <Label for="schedule-enabled" class="text-base"
                   >Enable Schedule</Label
                 >
                 <p class="text-sm text-muted-foreground">
                   Turn scheduled messages on or off
                 </p>
               </div>
-              <Switch
-                id="schedule-enabled"
-                checked="{scheduleEnabled}"
-                onCheckedChange="{setScheduleEnabled}"
-              />
+              <Switch id="schedule-enabled" />
             </div>
 
             <!-- Time Selection -->
@@ -172,7 +172,7 @@ function back() {
               class="w-10 h-10 bg-purple-50 dark:bg-purple-950 rounded-lg flex items-center justify-center"
             >
               <Moon
-                v-if="theme === 'dark'"
+                v-if="isDarkMode"
                 class="w-5 h-5 text-purple-600 dark:text-purple-400"
               />
               <Sun
@@ -190,12 +190,12 @@ function back() {
 
           <div class="flex items-center justify-between">
             <div>
-              <Label htmlFor="dark-mode" class="text-base">Dark Mode</Label>
+              <Label for="dark-mode" class="text-base">Dark Mode</Label>
               <p class="text-sm text-muted-foreground">
                 Switch between light and dark themes
               </p>
             </div>
-            <Switch id="dark-mode" />
+            <Switch id="dark-mode" @click="toggleTheme" v-model="isDarkMode" />
           </div>
         </Card>
 

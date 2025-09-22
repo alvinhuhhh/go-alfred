@@ -16,4 +16,24 @@ const checkTelegramEnvironment = (): boolean => {
   return hasTelegramWebApp || hasTelegramParams || isTelegramUserAgent;
 };
 
-export { checkTelegramEnvironment };
+const getTheme = (): "light" | "dark" => {
+  // Check for saved theme preference
+  const savedTheme = localStorage.getItem("alfred-theme") as "light" | "dark";
+  if (savedTheme) {
+    return savedTheme;
+  } else {
+    // Check system preference
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+    return prefersDark ? "dark" : "light";
+  }
+};
+
+const setTheme = (theme: "light" | "dark"): void => {
+  document.documentElement.classList.remove("light", "dark");
+  document.documentElement.classList.add(theme);
+  localStorage.setItem("alfred-theme", theme);
+};
+
+export { checkTelegramEnvironment, getTheme, setTheme };
