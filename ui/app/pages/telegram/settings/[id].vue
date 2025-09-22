@@ -1,8 +1,11 @@
 <script setup>
-import { ArrowLeft, Moon, Sun, MessageSquare } from "lucide-vue-next";
+import { ArrowLeft, Moon, Sun, MessageSquare, Clock } from "lucide-vue-next";
 
 const theme = "light";
-const scheduleEnabled = ref(false);
+const scheduleEnabled = ref(true);
+const scheduleTime = ref(null);
+const scheduleFrequency = ref(null);
+
 const timeOptions = [
   { value: "06:00", label: "6:00 AM" },
   { value: "07:00", label: "7:00 AM" },
@@ -98,6 +101,27 @@ function back() {
               :class="!scheduleEnabled ? 'opacity-50' : ''"
             >
               <Label for="schedule-time">Time</Label>
+              <SelectRoot :value="scheduleTime" :disabled="!scheduleEnabled">
+                <SelectTrigger id="schedule-time">
+                  <div class="flex items-center space-x-2">
+                    <Clock class="w-4 h-4" />
+                    <SelectValue placeholder="Select time" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectViewport>
+                    <SelectItem
+                      v-for="option in timeOptions"
+                      :key="option.value"
+                      :value="option.value"
+                    >
+                      <SelectItemText>
+                        {{ option.label }}
+                      </SelectItemText>
+                    </SelectItem>
+                  </SelectViewport>
+                </SelectContent>
+              </SelectRoot>
             </div>
 
             <!-- Frequency Selection -->
@@ -106,6 +130,27 @@ function back() {
               :class="!scheduleEnabled ? 'opacity-50' : ''"
             >
               <Label for="schedule-frequency">Frequency</Label>
+              <SelectRoot
+                :value="scheduleFrequency"
+                :disabled="!scheduleEnabled"
+              >
+                <SelectTrigger id="schedule-frequency">
+                  <SelectValue placeholder="Select frequency" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectViewport>
+                    <SelectItem
+                      v-for="option in frequencyOptions"
+                      :key="option.value"
+                      :value="option.value"
+                    >
+                      <SelectItemText>
+                        {{ option.label }}
+                      </SelectItemText>
+                    </SelectItem>
+                  </SelectViewport>
+                </SelectContent>
+              </SelectRoot>
             </div>
 
             <!-- Current Schedule Summary -->
