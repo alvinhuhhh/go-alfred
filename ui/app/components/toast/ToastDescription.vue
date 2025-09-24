@@ -21,11 +21,9 @@ const icon = computed(() => {
 </script>
 
 <template>
-  <ToastDescription
-    class="[grid-area:_description] m-0 text-slate11 text-xs leading-[1.3] flex items-center gap-2"
-  >
-    <component :is="icon" class="w-4 h-4" />
-    <span class="text-sm font-bold text-muted-foreground">
+  <ToastDescription class="flex items-center gap-x-2">
+    <component :is="icon" class="w-4 h-4 ml-4 text-foreground" />
+    <span class="text-sm text-foreground">
       <slot />
     </span>
   </ToastDescription>

@@ -94,9 +94,7 @@ async function copyValue(id) {
               <span>Add</span>
             </Button>
           </DialogTrigger>
-          <DialogContent
-            @dialog-close="setIsDialogOpen"
-          >
+          <DialogContent @dialog-close="setIsDialogOpen">
             <DialogHeader>
               <DialogTitle>Add New Note</DialogTitle>
             </DialogHeader>
@@ -153,7 +151,7 @@ async function copyValue(id) {
               size="sm"
               class="p-2"
             >
-              <EyeOff v-if="!note.isVisible" class="w-4 h-4" />
+              <EyeOff v-if="note.isVisible" class="w-4 h-4" />
               <Eye v-else class="w-4 h-4" />
             </Button>
             <Button
@@ -183,6 +181,5 @@ async function copyValue(id) {
         toastMessage
       }}</ToastDescription>
     </ToastRoot>
-    <ToastViewport />
   </div>
 </template>

@@ -3,7 +3,7 @@ import { ToastProvider } from "reka-ui";
 </script>
 
 <template>
-  <ToastProvider>
+  <ToastProvider swipe-direction="down">
     <slot />
   </ToastProvider>
 </template>
