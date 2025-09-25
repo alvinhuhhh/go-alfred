@@ -24,7 +24,7 @@ const features = [
     description: "Configure Alfred preferences",
     icon: Settings,
     color: "bg-gray-50 dark:bg-gray-950 text-gray-600 dark:text-gray-400",
-    available: true,
+    available: false,
   },
   {
     id: "more",
@@ -72,7 +72,7 @@ function handleFeatureClick(id) {
         >
           <Button
             variant="ghost"
-            class="w-full h-auto p-6 flex items-center justify-start space-x-4 hover:bg-accent"
+            class="w-full h-auto p-6 flex items-center justify-start space-x-4 hover:bg-accent-hover"
             :class="
               feature.available
                 ? ''

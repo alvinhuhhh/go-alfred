@@ -7,14 +7,14 @@ const props = defineProps({
 
 const variant = computed(() => {
   switch (props.variant) {
-    case "secondary":
-      return "bg-secondary text-secondary-foreground hover:bg-secondary/80";
     case "destructive":
       return "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60";
     case "outline":
-      return "border bg-background text-foreground hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50";
+      return "border bg-background text-foreground hover:bg-accent-hover hover:text-accent-foreground dark:bg-input dark:border-border dark:hover:bg-accent-hover";
+    case "secondary":
+      return "bg-secondary text-secondary-foreground hover:bg-secondary-hover";
     case "ghost":
-      return "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50";
+      return "hover:bg-accent-hover hover:text-accent-foreground";
     case "link":
       return "text-primary underline-offset-4 hover:underline";
     default:
