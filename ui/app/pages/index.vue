@@ -18,20 +18,21 @@ const features = [
   {
     title: "Secure Notebook",
     description:
-      "Store and share secrets, passwords, and important information securely",
+      "Store and share passwords, notes, and important information securely with your group",
     icon: BookOpen,
     color: "bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400",
   },
   {
     title: "Smart Scheduling",
     description:
-      "Automated reminders and messages sent to your chat at perfect times",
+      "Automated reminders and messages sent to your group chat at perfect times",
     icon: MessageSquare,
     color: "bg-green-50 dark:bg-green-950 text-green-600 dark:text-green-400",
   },
   {
-    title: "Advanced Features",
-    description: "Coming soon: More advanced tools to simplify your life",
+    title: "Smart Automation",
+    description:
+      "Coming soon: Advanced tools for managing shared tasks and reminders",
     icon: Sparkles,
     color:
       "bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400",
@@ -48,17 +49,21 @@ function handleGetStarted() {
     <div class="max-w-4xl mx-auto">
       <!-- Hero Section -->
       <div class="max-w-4xl mx-auto px-4 py-16">
-        <div class="text-center mb-16">
+        <div class="text-center">
           <div
-            class="w-20 h-20 bg-primary rounded-full mx-auto mb-6 flex items-center justify-center"
-          >
-            <User class="w-10 h-10 text-primary-foreground" />
-          </div>
+          class="w-24 h-24 bg-secondary border rounded-full mx-auto mb-4 flex items-center justify-center"
+        >
+          <img
+            src="~/assets/img/alfred-v2-transparent-bg.png"
+            class="w-full h-full rounded-full"
+          />
+        </div>
           <h1 class="text-4xl md:text-6xl font-medium text-foreground mb-4">
             Meet Alfred
           </h1>
           <p class="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Your personal administrative assistant, powered by Telegram
+            Your personal administrative assistant. Organize, automate, and
+            streamline your group's shared tasks through Telegram.
           </p>
           <div
             class="flex flex-col sm:flex-row gap-4 justify-center items-center"
@@ -116,7 +121,7 @@ function handleGetStarted() {
             </div>
             <h4 class="font-medium text-foreground">Add to Telegram</h4>
             <p class="text-muted-foreground">
-              Start a conversation with Alfred on Telegram or add to group
+              Start a conversation with Alfred on Telegram
             </p>
           </div>
           <div class="space-y-4">
@@ -128,7 +133,9 @@ function handleGetStarted() {
               >
             </div>
             <h4 class="font-medium text-foreground">Configure Settings</h4>
-            <p class="text-muted-foreground">Set up your preferences</p>
+            <p class="text-muted-foreground">
+              Set up your preferences and group settings
+            </p>
           </div>
           <div class="space-y-4">
             <div
@@ -140,7 +147,7 @@ function handleGetStarted() {
             </div>
             <h4 class="font-medium text-foreground">Enjoy Automation</h4>
             <p class="text-muted-foreground">
-              Let Alfred handle your chat's administrative tasks
+              Let Alfred handle your group's administrative tasks
             </p>
           </div>
         </div>
@@ -167,7 +174,7 @@ function handleGetStarted() {
 
       <!-- Footer -->
       <div class="text-center py-16 text-muted-foreground">
-        <p>Alfred v1.0 — Your personal butler, right in your chats.</p>
+        <p>Alfred v1.0 - Your digital butler, powered by Telegram</p>
       </div>
     </div>
   </div>

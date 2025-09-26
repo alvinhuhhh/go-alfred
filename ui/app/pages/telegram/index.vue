@@ -55,12 +55,17 @@ function handleFeatureClick(id) {
       <!-- Header -->
       <div class="text-center mb-8 pt-4">
         <div
-          class="w-16 h-16 bg-primary rounded-full mx-auto mb-4 flex items-center justify-center"
+          class="w-24 h-24 bg-secondary border rounded-full mx-auto mb-2 flex items-center justify-center"
         >
-          <User class="w-8 h-8 text-primary-foreground" />
+          <img
+            src="~/assets/img/alfred-v2-transparent-bg.png"
+            class="w-full h-full rounded-full"
+          />
         </div>
         <h1 class="text-2xl font-medium text-foreground mb-2">Alfred</h1>
-        <p class="text-muted-foreground">Your personal butler</p>
+        <p class="text-muted-foreground">
+          Your shared assistant powered by Telegram
+        </p>
       </div>
 
       <!-- Feature Cards -->
@@ -110,7 +115,9 @@ function handleFeatureClick(id) {
 
       <!-- Footer -->
       <div class="mt-12 text-center">
-        <p class="text-xs text-muted-foreground">Alfred v1.0 - Built for fun</p>
+        <p class="text-xs text-muted-foreground">
+          Alfred v1.0 - Your digital butler
+        </p>
       </div>
     </div>
   </div>
