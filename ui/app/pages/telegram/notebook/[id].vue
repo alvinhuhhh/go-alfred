@@ -18,6 +18,7 @@ interface Note {
 }
 
 interface Secret {
+  id: number | undefined;
   key: string;
   value: string;
   chatId: number;
@@ -30,6 +31,7 @@ const { public: config } = useRuntimeConfig();
 const chatId: string = route.params.id as string;
 const initDataRaw = useState<string>("initDataRaw");
 const encryptionKey = useState<string>("encryptionKey");
+const dek = await getDEK(encryptionKey.value);
 
 const isDialogOpen = ref(false);
 const isToastOpen = ref(false);
@@ -37,6 +39,30 @@ const toastStatus = ref("success");
 const toastMessage = ref("");
 
 const notes: Ref<Note[]> = ref([]);
+
+async function getNotes(): Promise<Note[]> {
+  const res = await useFetch<Secret[]>(`/api/secrets/${chatId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `tma ${initDataRaw.value}`,
+    },
+  });
+
+  let id = 1;
+  const notes: Note[] = [];
+  res.data.value?.forEach(async (s) => {
+    const decrypted = await decrypt(dek, s.ivB64, s.value, chatId);
+    notes.push({
+      id: s.id ?? id++,
+      key: s.key,
+      value: decrypted,
+      isVisible: false,
+      copyIcon: Copy,
+    });
+  });
+
+  return notes;
+}
 
 function back() {
   return navigateTo("/telegram");
@@ -81,8 +107,6 @@ async function copyValue(id: number) {
 const newKey = ref("");
 const newValue = ref("");
 async function submitNewNote() {
-  const dek = await getDEK(encryptionKey.value);
-
   const { iv, ciphertext } = await encrypt(
     dek,
     newValue.value,
@@ -90,21 +114,36 @@ async function submitNewNote() {
   );
 
   const newSecret: Secret = {
+    id: undefined,
     key: newKey.value,
     value: ciphertext,
     chatId: parseInt(chatId),
     keyVersion: config.keyVersion as number,
     ivB64: iv,
   };
-  const res = await $fetch("/api/secrets", {
+  await $fetch("/api/secrets", {
     method: "POST",
     body: JSON.stringify(newSecret),
     headers: {
       Authorization: `tma ${initDataRaw.value}`,
     },
+  }).catch((err) => {
+    isDialogOpen.value = false;
+    isToastOpen.value = true;
+    toastStatus.value = "error";
+    toastMessage.value = "An error occurred, failed to add new note";
+    return;
   });
-  console.log(res);
+
+  isDialogOpen.value = false;
+  isToastOpen.value = true;
+  toastStatus.value = "success";
+  toastMessage.value = "New note added!";
 }
+
+onMounted(async () => {
+  notes.value = await getNotes();
+});
 </script>
 
 <template>
