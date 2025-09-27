@@ -118,11 +118,7 @@ async function copyValue(id: number) {
 const newKey = ref("");
 const newValue = ref("");
 async function submitNewNote() {
-  const { iv, ciphertext } = await encrypt(
-    dek,
-    newValue.value,
-    JSON.stringify(chatId)
-  );
+  const { iv, ciphertext } = await encrypt(dek, newValue.value, chatId);
 
   const newSecret: Secret = {
     id: undefined,
@@ -132,6 +128,7 @@ async function submitNewNote() {
     keyVersion: config.keyVersion as number,
     ivB64: iv,
   };
+
   await $fetch("/api/secrets", {
     method: "POST",
     body: JSON.stringify(newSecret),

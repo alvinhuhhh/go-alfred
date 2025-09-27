@@ -101,6 +101,7 @@ const decrypt = async (
     );
     return new TextDecoder("utf-8").decode(plaintext);
   } catch (err: any) {
+    console.error(err);
     throw new Error("decryption failed");
   }
 };
