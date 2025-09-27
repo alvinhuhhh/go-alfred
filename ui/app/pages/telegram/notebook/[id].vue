@@ -8,9 +8,9 @@ import {
   Copy,
   Check,
 } from "lucide-vue-next";
-import { init, initDataRaw } from "@telegram-apps/sdk-vue";
+import { init, initData } from "@telegram-apps/sdk-vue";
 init();
-console.log(initDataRaw);
+console.log(initData.raw());
 
 const isDialogOpen = ref(false);
 const isToastOpen = ref(false);
@@ -18,13 +18,13 @@ const toastStatus = ref("success");
 const toastMessage = ref("");
 
 const data = await useFetch("/api/encryption/key", {
-  method: "POST",
+  method: "GET",
   params: {
     keyVersion: 1,
     chatId: 2201662822,
   },
   headers: {
-    Authorization: `tma ${initDataRaw}`,
+    Authorization: `tma ${initData.raw()}`,
   },
 });
 console.log(data);
