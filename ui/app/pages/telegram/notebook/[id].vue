@@ -26,7 +26,7 @@ interface Secret {
 }
 
 const route = useRoute();
-const runtimeConfig = useRuntimeConfig();
+const { public: config } = useRuntimeConfig();
 const chatId: string = route.params.id as string;
 const initDataRaw = useState<string>("initDataRaw");
 const encryptionKey = useState<string>("encryptionKey");
@@ -93,7 +93,7 @@ async function submitNewNote() {
     key: newKey.value,
     value: ciphertext,
     chatId: parseInt(chatId),
-    keyVersion: runtimeConfig.keyVersion as number,
+    keyVersion: config.keyVersion as number,
     ivB64: iv,
   };
   const res = await $fetch("/api/secrets", {

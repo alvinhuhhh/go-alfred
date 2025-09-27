@@ -7,8 +7,7 @@ import {
   Sparkles,
 } from "lucide-vue-next";
 
-const runtimeConfig = useRuntimeConfig();
-if (!runtimeConfig.public.devMode && checkTelegramEnvironment()) {
+if (!import.meta.dev && checkTelegramEnvironment()) {
   // Redirect to /telegram if opened in Telegram
   navigateTo("/telegram");
 }

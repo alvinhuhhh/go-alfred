@@ -2,8 +2,7 @@
 import { BookOpen, Settings, Sparkles } from "lucide-vue-next";
 
 const chatId = useState<number>("chatId");
-const runtimeConfig = useRuntimeConfig();
-if (!runtimeConfig.public.devMode && !checkTelegramEnvironment()) {
+if (!import.meta.dev && !checkTelegramEnvironment()) {
   // If not opened in Telegram redirect to Landing
   navigateTo("/");
 }

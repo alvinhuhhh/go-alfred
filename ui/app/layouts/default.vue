@@ -1,13 +1,13 @@
 <script setup lang="ts">
-const runtimeConfig = useRuntimeConfig();
+const { public: config } = useRuntimeConfig();
 const chatId = useState<number>("chatId", () => {
-  if (runtimeConfig.public.devMode) {
+  if (import.meta.dev) {
     return 1;
   }
   return getChatId() ?? getUserId() ?? 1;
 });
 const initDataRaw = useState<string>("initDataRaw", () => {
-  if (runtimeConfig.public.devMode) {
+  if (import.meta.dev) {
     return "";
   }
   return getInitDataRaw() ?? "";
@@ -17,13 +17,11 @@ const encryptionKey = useState<string>("encryptionKey", () => {
 });
 
 onMounted(async () => {
-  console.log(runtimeConfig.public.devMode);
-  console.log(runtimeConfig.public.keyVersion);
   setTheme(getTheme());
-  encryptionKey.value = runtimeConfig.public.devMode
+  encryptionKey.value = import.meta.dev
     ? "+tuHPldsy0hy16yebxkQsmlHiZKkhlq3gzm447tWdkQ="
     : await fetchEncryptionKey(
-        runtimeConfig.keyVersion as number,
+        config.keyVersion as number,
         chatId.value,
         initDataRaw.value
       );
