@@ -38,9 +38,11 @@ const isToastOpen = ref(false);
 const toastStatus = ref("success");
 const toastMessage = ref("");
 
-const notes: Ref<Note[]> = ref([]);
-
-async function getNotes(): Promise<Note[]> {
+const {
+  data: notes,
+  pending,
+  error,
+} = await useAsyncData<Note[]>(async () => {
   const res = await useFetch<Secret[]>(`/api/secrets/${chatId}`, {
     method: "GET",
     headers: {
@@ -62,7 +64,7 @@ async function getNotes(): Promise<Note[]> {
   });
 
   return notes;
-}
+});
 
 function back() {
   return navigateTo("/telegram");
@@ -73,7 +75,7 @@ function formatValue(value: string, isVisible: boolean) {
 }
 
 function toggleValueVisibility(id: number) {
-  const note = notes.value.find((n) => n.id === id);
+  const note = notes.value?.find((n) => n.id === id);
   if (note) note.isVisible = !note.isVisible;
 }
 
@@ -83,7 +85,7 @@ function setIsDialogOpen() {
 
 async function copyValue(id: number) {
   try {
-    const note = notes.value.find((n) => n.id === id);
+    const note = notes.value?.find((n) => n.id === id);
     if (!note) return;
 
     const text = note.value;
@@ -140,10 +142,6 @@ async function submitNewNote() {
   toastStatus.value = "success";
   toastMessage.value = "New note added!";
 }
-
-onMounted(async () => {
-  notes.value = await getNotes();
-});
 </script>
 
 <template>
@@ -253,13 +251,17 @@ onMounted(async () => {
         </Card>
 
         <!-- Empty state -->
-        <div v-if="notes.length < 1" class="text-center py-12">
+        <div v-if="!notes" class="text-center py-12">
           <p class="text-muted-foreground mb-4">No notes yet</p>
           <Button @click="setIsDialogOpen">
             <Plus class="w-4 h-4 mr-2" />
             Add your first note
           </Button>
         </div>
+
+        <!-- Pending state -->
+
+        <!-- Error state -->
       </div>
     </div>
 

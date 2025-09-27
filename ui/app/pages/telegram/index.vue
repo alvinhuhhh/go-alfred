@@ -1,10 +1,15 @@
 <script setup lang="ts">
+import { init } from "@telegram-apps/sdk-vue";
 import { BookOpen, Settings, Sparkles } from "lucide-vue-next";
 
 const chatId = useState<number>("chatId");
 if (!import.meta.dev && !checkTelegramEnvironment()) {
-  // If not opened in Telegram redirect to Landing
-  navigateTo("/");
+  try {
+    init();
+  } catch (err) {
+    // If not opened in Telegram redirect to Landing
+    navigateTo("/");
+  }
 }
 
 const features = [

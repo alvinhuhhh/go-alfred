@@ -7,11 +7,6 @@ import {
   Sparkles,
 } from "lucide-vue-next";
 
-if (!import.meta.dev && checkTelegramEnvironment()) {
-  // Redirect to /telegram if opened in Telegram
-  navigateTo("/telegram");
-}
-
 const features = [
   {
     title: "Secure Notebook",
