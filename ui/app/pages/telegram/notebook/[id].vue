@@ -260,8 +260,14 @@ async function submitNewNote() {
         </div>
 
         <!-- Pending state -->
+        <div v-if="pending" class="text-center py-12">
+          <p class="text-muted-foreground">Loading</p>
+        </div>
 
         <!-- Error state -->
+        <div v-if="error" class="text-center py-12">
+          <p class="text-muted-foreground">{{ error }}</p>
+        </div>
       </div>
     </div>
 
