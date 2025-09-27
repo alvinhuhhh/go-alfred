@@ -8,9 +8,6 @@ import {
   Copy,
   Check,
 } from "lucide-vue-next";
-import { init, initData } from "@telegram-apps/sdk-vue";
-init();
-console.log(initData.raw());
 
 const isDialogOpen = ref(false);
 const isToastOpen = ref(false);
@@ -24,7 +21,7 @@ const data = await useFetch("/api/encryption/key", {
     chatId: 2201662822,
   },
   headers: {
-    Authorization: `tma ${initData.raw()}`,
+    Authorization: `tma`,
   },
 });
 console.log(data);

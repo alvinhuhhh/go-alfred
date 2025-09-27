@@ -5,7 +5,6 @@ import {
   Smartphone,
   BookOpen,
   Sparkles,
-  User,
 } from "lucide-vue-next";
 
 const appConfig = useAppConfig();
@@ -51,13 +50,13 @@ function handleGetStarted() {
       <div class="max-w-4xl mx-auto px-4 py-16">
         <div class="text-center">
           <div
-          class="w-24 h-24 bg-secondary border rounded-full mx-auto mb-4 flex items-center justify-center"
-        >
-          <img
-            src="~/assets/img/alfred-v2-transparent-bg.png"
-            class="w-full h-full rounded-full"
-          />
-        </div>
+            class="w-24 h-24 bg-secondary border rounded-full mx-auto mb-4 flex items-center justify-center"
+          >
+            <img
+              src="~/assets/img/alfred-v2-transparent-bg.png"
+              class="w-full h-full rounded-full"
+            />
+          </div>
           <h1 class="text-4xl md:text-6xl font-medium text-foreground mb-4">
             Meet Alfred
           </h1>
