@@ -35,12 +35,6 @@ envs:
   scope: RUN_AND_BUILD_TIME
   type: SECRET
   value: EV[1:ud7zUpntNc4lGUSL8dXsWc2BarE3Hf+V:8Tlxx7dWUtLMthe8Qza1VLQWsHlaNKAf28XEGQS6zGPMuBMiDm+epl8iJIZibg9H4RCE5B4WMnDBPtGM]
-- key: NUXT_PUBLIC_DEV_MODE
-  scope: RUN_AND_BUILD_TIME
-  value: "false"
-- key: NUXT_PUBLIC_KEY_VERSION
-  scope: RUN_AND_BUILD_TIME
-  value: "1"
 features:
 - buildpack-stack=ubuntu-22
 ingress:

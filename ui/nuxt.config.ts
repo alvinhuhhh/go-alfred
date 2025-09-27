@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      keyVersion: 500,
+      keyVersion: 1,
     },
   },
 });
