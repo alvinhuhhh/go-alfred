@@ -17,15 +17,40 @@ function base64ToArrayBuffer(base64: string) {
   return bytes.buffer;
 }
 
-function arrayBufferToBase64(buffer: Uint8Array<ArrayBuffer> | ArrayBuffer) {
-  let binary = "";
+function arrayBufferToBase64(buffer: ArrayBuffer | Uint8Array) {
+  // Create a Uint*Array to hold the buffer
   const bytes = new Uint8Array(buffer);
+
+  // Get the length of the buffer
   const len = bytes.byteLength;
+
+  // Populate binary string with the character codes of the buffer
+  let binary = "";
   for (let i = 0; i < len; i++) {
     const b = bytes[i];
     if (b) binary += String.fromCharCode(b);
   }
+
+  // Convert to string
   return window.btoa(binary);
+}
+
+async function fetchEncryptionKey(
+  keyVersion: number,
+  chatId: number,
+  initDataRaw: string
+): Promise<string> {
+  const data = await $fetch<string>("/api/encryption/key", {
+    method: "GET",
+    params: {
+      keyVersion: keyVersion,
+      chatId: chatId,
+    },
+    headers: {
+      Authorization: `tma ${initDataRaw}`,
+    },
+  });
+  return data as string;
 }
 
 const getDEK = async (base64: string): Promise<CryptoKey> => {
@@ -64,25 +89,20 @@ const decrypt = async (
   ciphertext: string,
   addData: string
 ): Promise<string> => {
-  const encoder = new TextEncoder();
-  const ivArray = new Uint8Array(base64ToArrayBuffer(iv));
-  const aad = encoder.encode(addData);
-
   try {
     const plaintext = await crypto.subtle.decrypt(
       {
         name: "AES-GCM",
-        iv: ivArray,
-        additionalData: aad,
+        iv: base64ToArrayBuffer(iv),
+        additionalData: new TextEncoder().encode(addData),
       },
       key,
       base64ToArrayBuffer(ciphertext)
     );
-    const decoder = new TextDecoder("utf-8");
-    return decoder.decode(plaintext);
+    return new TextDecoder("utf-8").decode(plaintext);
   } catch (err: any) {
     throw new Error("decryption failed");
   }
 };
 
-export { encrypt, decrypt };
+export { fetchEncryptionKey, getDEK, encrypt, decrypt };

@@ -125,21 +125,21 @@ func main() {
 	}
 
 	router := mux.NewRouter()
-	
+
 	// API router
 	api := router.PathPrefix("/api").Subrouter()
 	api.Use(middleware.SetAccessControlHeaders)
 	api.Use(middleware.LogRequests)
 	api.Use(middleware.Auth)
-	
+
 	api.HandleFunc("/webhook", b.WebhookHandler()).Methods(http.MethodGet, http.MethodPost, http.MethodPut, http.MethodOptions) // routes to Bot handlers
 	api.HandleFunc("/ping", httpHandler.Ping).Methods(http.MethodGet)
 	api.HandleFunc("/cron", dinnerService.CronTrigger).Methods(http.MethodPost)
 
 	api.HandleFunc("/encryption/key", secretService.GetDataEncryptionKey).Methods(http.MethodGet)
-	api.HandleFunc("/secrets/{chatId}", secretService.GetDataEncryptionKey).Methods(http.MethodGet)
-	api.HandleFunc("/secrets", secretService.GetDataEncryptionKey).Methods(http.MethodPost)
-	api.HandleFunc("/secrets/{id}", secretService.GetDataEncryptionKey).Methods(http.MethodDelete)
+	api.HandleFunc("/secrets/{chatId}", secretService.GetSecretsForChatId).Methods(http.MethodGet)
+	api.HandleFunc("/secrets", secretService.InsertSecret).Methods(http.MethodPost)
+	api.HandleFunc("/secrets/{id}", secretService.DeleteSecret).Methods(http.MethodDelete)
 
 	// Web router
 	web := router.NewRoute().Subrouter()

@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { BookOpen, Settings, Sparkles } from "lucide-vue-next";
-import { getChatId } from "~/utils";
 
+const chatId = useState<number>("chatId");
 const appConfig = useAppConfig();
 if (!appConfig.devMode && !checkTelegramEnvironment()) {
   // If not opened in Telegram redirect to Landing
   navigateTo("/");
 }
-
-const chatId = getChatId() ?? getUserId();
 
 const features = [
   {
@@ -41,9 +39,9 @@ const features = [
 function handleFeatureClick(id: string) {
   switch (id) {
     case "notebook":
-      return navigateTo("/telegram/notebook/" + chatId);
+      return navigateTo("/telegram/notebook/" + chatId.value);
     case "settings":
-      return navigateTo("/telegram/settings/" + chatId);
+      return navigateTo("/telegram/settings/" + chatId.value);
     default:
       return;
   }

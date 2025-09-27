@@ -9,7 +9,6 @@ import {
   Check,
 } from "lucide-vue-next";
 import appConfig from "~/app.config";
-import { getInitDataRaw } from "~/utils";
 
 interface Note {
   id: number;
@@ -28,32 +27,14 @@ interface Secret {
 }
 
 const route = useRoute();
+const chatId: string = route.params.id as string;
+const initDataRaw = useState<string>("initDataRaw");
+const encryptionKey = useState<string>("encryptionKey");
 
-const chatId = route.params.id;
-const initDataRaw = getInitDataRaw();
 const isDialogOpen = ref(false);
 const isToastOpen = ref(false);
 const toastStatus = ref("success");
 const toastMessage = ref("");
-const newNote: Ref<Note> = ref({
-  id: -1,
-  key: "",
-  value: "",
-  isVisible: false,
-  copyIcon: Copy,
-});
-
-const { data, pending, error, status } = await useFetch("/api/encryption/key", {
-  method: "GET",
-  params: {
-    keyVersion: appConfig.keyVersion,
-    chatId: chatId,
-  },
-  headers: {
-    Authorization: `tma ${initDataRaw}`,
-  },
-});
-console.log(data);
 
 const notes: Ref<Note[]> = ref([]);
 
@@ -97,8 +78,32 @@ async function copyValue(id: number) {
   }
 }
 
-function submitNewNote() {
-  console.log(newNote.value);
+const newKey = ref("");
+const newValue = ref("");
+async function submitNewNote() {
+  const dek = await getDEK(encryptionKey.value);
+
+  const { iv, ciphertext } = await encrypt(
+    dek,
+    newValue.value,
+    JSON.stringify(chatId)
+  );
+
+  const newSecret: Secret = {
+    key: newKey.value,
+    value: ciphertext,
+    chatId: parseInt(chatId),
+    keyVersion: appConfig.keyVersion,
+    ivB64: iv,
+  };
+  const res = await $fetch("/secrets", {
+    method: "POST",
+    body: JSON.stringify(newSecret),
+    headers: {
+      Authorization: `tma ${initDataRaw.value}`,
+    },
+  });
+  console.log(res);
 }
 </script>
 
@@ -137,7 +142,7 @@ function submitNewNote() {
                   <Input
                     id="key"
                     placeholder="e.g., WiFi Password"
-                    v-model="newNote.key"
+                    v-model="newKey"
                   />
                 </div>
                 <div>
@@ -145,15 +150,16 @@ function submitNewNote() {
                   <Input
                     id="value"
                     placeholder="e.g., MyPassword123"
-                    v-model="newNote.value"
+                    v-model="newValue"
                   />
                 </div>
                 <div class="flex space-x-2 pt-2">
                   <Button class="flex-1" type="submit"> Add Note </Button>
                   <Button
                     variant="outline"
-                    @click="setIsDialogOpen"
                     class="flex-1"
+                    @click="setIsDialogOpen"
+                    type="reset"
                   >
                     Cancel
                   </Button>
