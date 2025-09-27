@@ -8,8 +8,7 @@ if (!appConfig.devMode && !checkTelegramEnvironment()) {
   navigateTo("/");
 }
 
-const chatId = getChatId();
-console.log(chatId);
+const chatId = getChatId() || getUserId();
 
 const features = [
   {
