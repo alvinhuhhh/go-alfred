@@ -7,6 +7,9 @@ import {
   EyeOff,
   Copy,
   Check,
+  LoaderCircle,
+  HeartCrack,
+  Frown,
 } from "lucide-vue-next";
 
 interface Note {
@@ -49,9 +52,10 @@ const {
       Authorization: `tma ${initDataRaw.value}`,
     },
   });
+  console.log(res);
 
   let id = 1;
-  const notes: Note[] = [];
+  let notes: Note[] = [];
   res.data.value?.forEach(async (s) => {
     const decrypted = await decrypt(dek, s.ivB64, s.value, chatId);
     notes.push({
@@ -250,23 +254,27 @@ async function submitNewNote() {
           </div>
         </Card>
 
+        <!-- Error state -->
+        <div v-if="error" class="flex flex-col items-center py-12">
+          <Frown class="w-8 h-8 text-muted-foreground mb-2" />
+          <p class="text-muted-foreground">An error occurred</p>
+        </div>
+
+        <!-- Pending state -->
+        <div v-else-if="pending" class="flex flex-col items-center py-12">
+          <LoaderCircle
+            class="w-8 h-8 text-muted-foreground animate-spin mb-2"
+          />
+          <p class="text-muted-foreground">Loading</p>
+        </div>
+
         <!-- Empty state -->
-        <div v-if="!notes" class="text-center py-12">
+        <div v-else-if="!notes" class="text-center py-12">
           <p class="text-muted-foreground mb-4">No notes yet</p>
           <Button @click="setIsDialogOpen">
             <Plus class="w-4 h-4 mr-2" />
             Add your first note
           </Button>
-        </div>
-
-        <!-- Pending state -->
-        <div v-if="pending" class="text-center py-12">
-          <p class="text-muted-foreground">Loading</p>
-        </div>
-
-        <!-- Error state -->
-        <div v-if="error" class="text-center py-12">
-          <p class="text-muted-foreground">{{ error }}</p>
         </div>
       </div>
     </div>
