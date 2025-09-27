@@ -17,6 +17,8 @@ const encryptionKey = useState<string>("encryptionKey", () => {
 });
 
 onMounted(async () => {
+  console.log(runtimeConfig.public.devMode);
+  console.log(runtimeConfig.public.keyVersion);
   setTheme(getTheme());
   encryptionKey.value = runtimeConfig.public.devMode
     ? "+tuHPldsy0hy16yebxkQsmlHiZKkhlq3gzm447tWdkQ="
