@@ -8,7 +8,16 @@ import {
   Copy,
   Check,
 } from "lucide-vue-next";
+import appConfig from "~/app.config";
 import { getInitDataRaw } from "~/utils";
+
+interface Note {
+  id: number;
+  key: string;
+  value: string;
+  isVisible: boolean;
+  copyIcon: Component;
+}
 
 const route = useRoute();
 
@@ -19,10 +28,10 @@ const isToastOpen = ref(false);
 const toastStatus = ref("success");
 const toastMessage = ref("");
 
-const data = await useFetch("/api/encryption/key", {
+const { data, pending, error, status } = await useFetch("/api/encryption/key", {
   method: "GET",
   params: {
-    keyVersion: 1,
+    keyVersion: appConfig.keyVersion,
     chatId: chatId,
   },
   headers: {
@@ -31,22 +40,7 @@ const data = await useFetch("/api/encryption/key", {
 });
 console.log(data);
 
-const notes = ref([
-  {
-    id: 1,
-    key: "CDC Vouchers",
-    value: "www.link.com",
-    isVisible: false,
-    copyIcon: Copy,
-  },
-  {
-    id: 2,
-    key: "Wifi Password",
-    value: "password@password",
-    isVisible: false,
-    copyIcon: Copy,
-  },
-]);
+const notes: Ref<Note[]> = ref([]);
 
 function back() {
   return navigateTo("/telegram");
