@@ -1,8 +1,9 @@
 <script setup>
 import { BookOpen, Settings, Sparkles } from "lucide-vue-next";
-import {init, initData} from '@telegram-apps/sdk-vue'
-init()
-console.log(initData.raw())
+import { init, initData } from "@telegram-apps/sdk-vue";
+init();
+initData.restore();
+console.log(initData.raw());
 
 const appConfig = useAppConfig();
 if (!appConfig.devMode && !checkTelegramEnvironment()) {
