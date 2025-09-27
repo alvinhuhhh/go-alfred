@@ -13,9 +13,11 @@ import (
 	"strconv"
 
 	"github.com/alvinhuhhh/go-alfred/internal/chat"
+	"github.com/alvinhuhhh/go-alfred/internal/config"
 	"github.com/alvinhuhhh/go-alfred/internal/dinner"
 	"github.com/alvinhuhhh/go-alfred/internal/handlers"
 	"github.com/alvinhuhhh/go-alfred/internal/middleware"
+	"github.com/alvinhuhhh/go-alfred/internal/secret"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"github.com/golang-migrate/migrate/v4"
@@ -65,10 +67,15 @@ func main() {
 		}),
 		bot.WithMiddlewares(middleware.LogBotRequests),
 	}
-	if isTestServer() {
+
+	if config.IsTestServer() {
 		opts = append(opts, bot.UseTestEnvironment())
 	}
-	b, err := bot.New(os.Getenv("BOT_TOKEN"), opts...)
+	token, err := config.GetBotToken()
+	if err != nil {
+		log.Fatal(err)
+	}
+	b, err := bot.New(token, opts...)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -87,6 +94,15 @@ func main() {
 		log.Fatal(err)
 	}
 	dinnerService, err := dinner.NewService(b, dinnerRepo, chatRepo)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	secretRepo, err := secret.NewRepo(db)
+	if err != nil {
+		log.Fatal(err)
+	}
+	secretService, err := secret.NewService(secretRepo)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -110,14 +126,19 @@ func main() {
 
 	router := mux.NewRouter()
 	
+	// API router
 	api := router.PathPrefix("/api").Subrouter()
 	api.Use(middleware.SetAccessControlHeaders)
 	api.Use(middleware.LogRequests)
+	api.Use(middleware.Auth)
 	
 	api.HandleFunc("/webhook", b.WebhookHandler()).Methods(http.MethodGet, http.MethodPost, http.MethodPut, http.MethodOptions) // routes to Bot handlers
 	api.HandleFunc("/ping", httpHandler.Ping).Methods(http.MethodGet)
 	api.HandleFunc("/cron", dinnerService.CronTrigger).Methods(http.MethodPost)
 
+	api.HandleFunc("/encryption/key", secretService.GetDataEncryptionKey).Methods(http.MethodGet)
+
+	// Web router
 	web := router.NewRoute().Subrouter()
 	web.Use(middleware.LogRequests)
 	web.PathPrefix("/").HandlerFunc(httpHandler.Serve)
@@ -132,11 +153,6 @@ func getPort() (string, error) {
 		return "", fmt.Errorf("unable to get PORT from env")
 	}
 	return port, nil
-}
-
-func isTestServer() bool {
-	t := os.Getenv("TELEGRAM_TEST_SERVER")
-	return t == "1"
 }
 
 func getDB() (*sqlx.DB, error) {

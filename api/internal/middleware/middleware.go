@@ -1,13 +1,18 @@
 package middleware
 
 import (
+	"slices"
 	"context"
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
+	"time"
 
+	"github.com/alvinhuhhh/go-alfred/internal/config"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	initdata "github.com/telegram-mini-apps/init-data-golang"
 )
 
 func LogRequests(next http.Handler) http.Handler {
@@ -37,4 +42,44 @@ func LogBotRequests(next bot.HandlerFunc) bot.HandlerFunc {
 		}
 		next(ctx, b, update)
 	}
+}
+
+func Auth(next http.Handler) http.Handler {
+	whitelist := []string{
+		"/webhook",
+		"/ping",
+		"/cron",
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Allow routes in whitelist
+		if slices.Contains(whitelist, r.URL.Path) {
+			next.ServeHTTP(w, r)
+			return 
+		}
+
+		// Get raw init data
+		auth := r.Header.Get("Authorization")
+		authSplit := strings.Split(auth, " ")
+		if authSplit[0] != "tma" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
+		// Get Bot token
+		token, err := config.GetBotToken()
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
+		// Set expiry time
+		exp := 24 * time.Hour
+
+		if err := initdata.Validate(authSplit[1], token, exp); err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }

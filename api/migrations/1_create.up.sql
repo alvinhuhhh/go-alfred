@@ -38,5 +38,6 @@ CREATE TABLE IF NOT EXISTS "public"."secrets" (
     "key" "text" NOT NULL,
     "value" "text" NOT NULL,
     "chat_id" bigint NOT NULL REFERENCES "public"."chats"("id") ON DELETE CASCADE,
-    "key_version" bigint NOT NULL
+    "key_version" bigint NOT NULL,
+    "iv_b64" "text" NOT NULL
 );
