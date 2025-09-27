@@ -30,9 +30,9 @@ func (r repo) GetChatByID(ctx context.Context, id int64) (*Chat, error) {
 }
 
 func (r repo) InsertChat(ctx context.Context, chat *Chat) (int64, error) {
-	query := "INSERT INTO chats(id, type, key_version) VALUES (?,?,?)"
+	query := "INSERT INTO chats(id, type) VALUES (?,?)"
 	query = r.db.Rebind(query)
-	_, err := r.db.ExecContext(ctx, query, &chat.ID, &chat.Type, &chat.KeyVersion)
+	_, err := r.db.ExecContext(ctx, query, &chat.ID, &chat.Type)
 	if err != nil {
 		return -1, err
 	}

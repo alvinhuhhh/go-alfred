@@ -7,8 +7,7 @@ CREATE TABLE IF NOT EXISTS "public"."chats" (
         NO MAXVALUE
         CACHE 1
     ),
-    "type" "text" NOT NULL,
-    "key_version" bigint NOT NULL
+    "type" "text" NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "public"."dinners" (
@@ -38,5 +37,6 @@ CREATE TABLE IF NOT EXISTS "public"."secrets" (
     ),
     "key" "text" NOT NULL,
     "value" "text" NOT NULL,
-    "chat_id" bigint NOT NULL REFERENCES "public"."chats"("id") ON DELETE CASCADE
+    "chat_id" bigint NOT NULL REFERENCES "public"."chats"("id") ON DELETE CASCADE,
+    "key_version" bigint NOT NULL
 );
