@@ -1,3 +1,4 @@
 export default defineAppConfig({
-  "devMode": true
-})
+  devMode: true,
+  keyVersion: 1,
+});

@@ -1,6 +1,7 @@
 package secret
 
 import (
+	"encoding/base64"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -50,5 +51,5 @@ func (s *service) GetDataEncryptionKey(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write(dek)
+	w.Write([]byte(base64.StdEncoding.EncodeToString(dek)))
 }
