@@ -46,9 +46,9 @@ func LogBotRequests(next bot.HandlerFunc) bot.HandlerFunc {
 
 func Auth(next http.Handler) http.Handler {
 	whitelist := []string{
-		"/webhook",
-		"/ping",
-		"/cron",
+		"/api/webhook",
+		"/api/ping",
+		"/api/cron",
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
