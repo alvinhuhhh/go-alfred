@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import {
   ArrowLeft,
   Plus,
@@ -8,11 +8,26 @@ import {
   Copy,
   Check,
 } from "lucide-vue-next";
+import { init, initDataRaw } from "@telegram-apps/sdk-vue";
+init();
+console.log(initDataRaw);
 
 const isDialogOpen = ref(false);
 const isToastOpen = ref(false);
 const toastStatus = ref("success");
 const toastMessage = ref("");
+
+const data = await useFetch("/api/encryption/key", {
+  method: "POST",
+  params: {
+    keyVersion: 1,
+    chatId: 2201662822,
+  },
+  headers: {
+    Authorization: `tma ${initDataRaw}`,
+  },
+});
+console.log(data);
 
 const notes = ref([
   {
@@ -35,22 +50,24 @@ function back() {
   return navigateTo("/telegram");
 }
 
-function formatValue(value, isVisible) {
+function formatValue(value: string, isVisible: boolean) {
   return isVisible ? value : "*".repeat(15);
 }
 
-function toggleValueVisibility(id) {
+function toggleValueVisibility(id: number) {
   const note = notes.value.find((n) => n.id === id);
-  note.isVisible = !note.isVisible;
+  if (note) note.isVisible = !note.isVisible;
 }
 
 function setIsDialogOpen() {
   isDialogOpen.value = !isDialogOpen.value;
 }
 
-async function copyValue(id) {
+async function copyValue(id: number) {
   try {
     const note = notes.value.find((n) => n.id === id);
+    if (!note) return;
+
     const text = note.value;
     await navigator.clipboard.writeText(text);
     note.copyIcon = Check;
