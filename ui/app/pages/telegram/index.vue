@@ -1,9 +1,6 @@
-<script setup>
+<script setup lang="ts">
 import { BookOpen, Settings, Sparkles } from "lucide-vue-next";
-import { init, initData } from "@telegram-apps/sdk-vue";
-init();
-initData.restore();
-console.log(initData.raw());
+import { getChatId } from "~/utils";
 
 const appConfig = useAppConfig();
 if (!appConfig.devMode && !checkTelegramEnvironment()) {
@@ -11,7 +8,7 @@ if (!appConfig.devMode && !checkTelegramEnvironment()) {
   navigateTo("/");
 }
 
-const chatId = 1;
+const chatId = getChatId();
 
 const features = [
   {
@@ -41,7 +38,7 @@ const features = [
   },
 ];
 
-function handleFeatureClick(id) {
+function handleFeatureClick(id: string) {
   switch (id) {
     case "notebook":
       return navigateTo("/telegram/notebook/" + chatId);

@@ -1,3 +1,5 @@
+import { init, initData } from "@telegram-apps/sdk-vue";
+
 const checkTelegramEnvironment = (): boolean => {
   // Check for Telegram WebApp API
   const hasTelegramWebApp = !!(window as any)?.Telegram?.WebApp;
@@ -14,6 +16,18 @@ const checkTelegramEnvironment = (): boolean => {
   const isTelegramUserAgent = userAgent.includes("telegram");
 
   return hasTelegramWebApp || hasTelegramParams || isTelegramUserAgent;
+};
+
+const getChatId = (): number | undefined => {
+  init();
+  initData.restore();
+  return initData.chat()?.id;
+};
+
+const getInitDataRaw = (): string | undefined => {
+  init();
+  initData.restore();
+  return initData.raw();
 };
 
 const getTheme = (): "light" | "dark" => {
@@ -36,4 +50,10 @@ const setTheme = (theme: "light" | "dark"): void => {
   localStorage.setItem("alfred-theme", theme);
 };
 
-export { checkTelegramEnvironment, getTheme, setTheme };
+export {
+  checkTelegramEnvironment,
+  getChatId,
+  getInitDataRaw,
+  getTheme,
+  setTheme,
+};

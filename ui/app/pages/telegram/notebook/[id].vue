@@ -8,7 +8,12 @@ import {
   Copy,
   Check,
 } from "lucide-vue-next";
+import { getInitDataRaw } from "~/utils";
 
+const route = useRoute();
+
+const chatId = route.params.id;
+const initDataRaw = getInitDataRaw();
 const isDialogOpen = ref(false);
 const isToastOpen = ref(false);
 const toastStatus = ref("success");
@@ -18,10 +23,10 @@ const data = await useFetch("/api/encryption/key", {
   method: "GET",
   params: {
     keyVersion: 1,
-    chatId: 2201662822,
+    chatId: chatId,
   },
   headers: {
-    Authorization: `tma`,
+    Authorization: `tma ${initDataRaw}`,
   },
 });
 console.log(data);
