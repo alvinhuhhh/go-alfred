@@ -19,6 +19,14 @@ interface Note {
   copyIcon: Component;
 }
 
+interface Secret {
+  key: string;
+  value: string;
+  chatId: number;
+  keyVersion: number;
+  ivB64: string;
+}
+
 const route = useRoute();
 
 const chatId = route.params.id;
@@ -27,6 +35,13 @@ const isDialogOpen = ref(false);
 const isToastOpen = ref(false);
 const toastStatus = ref("success");
 const toastMessage = ref("");
+const newNote: Ref<Note> = ref({
+  id: -1,
+  key: "",
+  value: "",
+  isVisible: false,
+  copyIcon: Copy,
+});
 
 const { data, pending, error, status } = await useFetch("/api/encryption/key", {
   method: "GET",
@@ -81,6 +96,10 @@ async function copyValue(id: number) {
     toastMessage.value = "Error copying to clipboard";
   }
 }
+
+function submitNewNote() {
+  console.log(newNote.value);
+}
 </script>
 
 <template>
@@ -108,29 +127,39 @@ async function copyValue(id: number) {
             </Button>
           </DialogTrigger>
           <DialogContent @dialog-close="setIsDialogOpen">
-            <DialogHeader>
-              <DialogTitle>Add New Note</DialogTitle>
-            </DialogHeader>
-            <div class="space-y-4 pt-4">
-              <div>
-                <Label htmlFor="key">Key</Label>
-                <Input id="key" placeholder="e.g., WiFi Password" />
+            <form @submit.prevent="submitNewNote">
+              <DialogHeader>
+                <DialogTitle>Add New Note</DialogTitle>
+              </DialogHeader>
+              <div class="space-y-4 pt-4">
+                <div>
+                  <Label htmlFor="key">Key</Label>
+                  <Input
+                    id="key"
+                    placeholder="e.g., WiFi Password"
+                    v-model="newNote.key"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="value">Value</Label>
+                  <Input
+                    id="value"
+                    placeholder="e.g., MyPassword123"
+                    v-model="newNote.value"
+                  />
+                </div>
+                <div class="flex space-x-2 pt-2">
+                  <Button class="flex-1" type="submit"> Add Note </Button>
+                  <Button
+                    variant="outline"
+                    @click="setIsDialogOpen"
+                    class="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                </div>
               </div>
-              <div>
-                <Label htmlFor="value">Value</Label>
-                <Input id="value" placeholder="e.g., MyPassword123" />
-              </div>
-              <div class="flex space-x-2 pt-2">
-                <Button class="flex-1"> Add Note </Button>
-                <Button
-                  variant="outline"
-                  @click="setIsDialogOpen"
-                  class="flex-1"
-                >
-                  Cancel
-                </Button>
-              </div>
-            </div>
+            </form>
           </DialogContent>
         </Dialog>
       </div>

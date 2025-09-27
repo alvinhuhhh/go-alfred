@@ -1,0 +1,88 @@
+function base64ToArrayBuffer(base64: string) {
+  // Decode the Base64 string into a binary string
+  const binaryString = atob(base64);
+
+  // Get the length of the binary string
+  const length = binaryString.length;
+
+  // Create a Uint8Array to hold the byte data
+  const bytes = new Uint8Array(length);
+
+  // Populate the Uint8Array with the character codes of the binary string
+  for (let i = 0; i < length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
+  // Return the underlying ArrayBuffer of the Uint8Array
+  return bytes.buffer;
+}
+
+function arrayBufferToBase64(buffer: Uint8Array<ArrayBuffer> | ArrayBuffer) {
+  let binary = "";
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    const b = bytes[i];
+    if (b) binary += String.fromCharCode(b);
+  }
+  return window.btoa(binary);
+}
+
+const getDEK = async (base64: string): Promise<CryptoKey> => {
+  const raw = base64ToArrayBuffer(base64);
+  return await crypto.subtle.importKey(
+    "raw",
+    raw,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"]
+  );
+};
+
+const encrypt = async (
+  key: CryptoKey,
+  plaintext: string,
+  addData: string
+): Promise<{ iv: string; ciphertext: string }> => {
+  const encoder = new TextEncoder();
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt(
+    {
+      name: "AES-GCM",
+      iv: iv,
+      additionalData: encoder.encode(addData),
+    },
+    key,
+    encoder.encode(plaintext)
+  );
+  return { iv: arrayBufferToBase64(iv), ciphertext: arrayBufferToBase64(ct) };
+};
+
+const decrypt = async (
+  key: CryptoKey,
+  iv: string,
+  ciphertext: string,
+  addData: string
+): Promise<string> => {
+  const encoder = new TextEncoder();
+  const ivArray = new Uint8Array(base64ToArrayBuffer(iv));
+  const aad = encoder.encode(addData);
+
+  try {
+    const plaintext = await crypto.subtle.decrypt(
+      {
+        name: "AES-GCM",
+        iv: ivArray,
+        additionalData: aad,
+      },
+      key,
+      base64ToArrayBuffer(ciphertext)
+    );
+    const decoder = new TextDecoder("utf-8");
+    return decoder.decode(plaintext);
+  } catch (err: any) {
+    throw new Error("decryption failed");
+  }
+};
+
+export { encrypt, decrypt };
