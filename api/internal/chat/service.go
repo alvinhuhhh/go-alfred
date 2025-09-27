@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/alvinhuhhh/go-alfred/internal/util"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 )
@@ -33,11 +34,22 @@ func (s *service) Start(ctx context.Context, b *bot.Bot, update *models.Update) 
 			})
 
 			// Insert new Chat
+			keyVersion, err := util.GetKeyVersion()
+			if err != nil {
+				slog.Error("MASTER_KEY_VERSION is undefined")
+				b.SendMessage(ctx, &bot.SendMessageParams{
+					ChatID: update.Message.Chat.ID,
+					Text:   "Sorry! Having a bit of trouble, will be back soon!",
+				})
+				return
+			}
 			id, err := s.repo.InsertChat(ctx, &Chat{
-				ID:   update.Message.Chat.ID,
-				Type: string(update.Message.Chat.Type),
+				ID:         update.Message.Chat.ID,
+				Type:       string(update.Message.Chat.Type),
+				KeyVersion: keyVersion,
 			})
 			if err != nil {
+				slog.Error("unable to insert new chat ", err)
 				b.SendMessage(ctx, &bot.SendMessageParams{
 					ChatID: update.Message.Chat.ID,
 					Text:   "Sorry! Having a bit of trouble, will be back soon!",
@@ -53,6 +65,7 @@ func (s *service) Start(ctx context.Context, b *bot.Bot, update *models.Update) 
 			return
 		}
 
+		slog.Error(err.Error())
 		// Handle any other error
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: update.Message.Chat.ID,

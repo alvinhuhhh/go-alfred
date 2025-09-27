@@ -28,6 +28,13 @@ envs:
 - key: TELEGRAM_TEST_SERVER
   scope: RUN_AND_BUILD_TIME
   value: "1"
+- key: MASTER_KEY_VERSION
+  scope: RUN_AND_BUILD_TIME
+  value: "1"
+- key: MASTER_KEY_V1
+  scope: RUN_AND_BUILD_TIME
+  type: SECRET
+  value: EV[1:ud7zUpntNc4lGUSL8dXsWc2BarE3Hf+V:8Tlxx7dWUtLMthe8Qza1VLQWsHlaNKAf28XEGQS6zGPMuBMiDm+epl8iJIZibg9H4RCE5B4WMnDBPtGM]
 features:
 - buildpack-stack=ubuntu-22
 ingress:
@@ -35,8 +42,6 @@ ingress:
   - component:
       name: alvinhuhhh-go-alfred
     match:
-      authority:
-        exact: ""
       path:
         prefix: /
 name: go-alfred-dev

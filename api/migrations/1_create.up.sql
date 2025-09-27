@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS "public"."chats" (
         NO MAXVALUE
         CACHE 1
     ),
-    "type" "text" NOT NULL
+    "type" "text" NOT NULL,
+    "key_version" bigint NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "public"."dinners" (
