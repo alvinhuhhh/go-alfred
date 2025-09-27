@@ -137,6 +137,9 @@ func main() {
 	api.HandleFunc("/cron", dinnerService.CronTrigger).Methods(http.MethodPost)
 
 	api.HandleFunc("/encryption/key", secretService.GetDataEncryptionKey).Methods(http.MethodGet)
+	api.HandleFunc("/secrets/{chatId}", secretService.GetDataEncryptionKey).Methods(http.MethodGet)
+	api.HandleFunc("/secrets", secretService.GetDataEncryptionKey).Methods(http.MethodPost)
+	api.HandleFunc("/secrets/{id}", secretService.GetDataEncryptionKey).Methods(http.MethodDelete)
 
 	// Web router
 	web := router.NewRoute().Subrouter()

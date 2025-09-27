@@ -181,7 +181,7 @@ async function copyValue(id: number) {
         <!-- Empty state -->
         <div v-if="notes.length < 1" class="text-center py-12">
           <p class="text-muted-foreground mb-4">No notes yet</p>
-          <Button>
+          <Button @click="setIsDialogOpen">
             <Plus class="w-4 h-4 mr-2" />
             Add your first note
           </Button>
