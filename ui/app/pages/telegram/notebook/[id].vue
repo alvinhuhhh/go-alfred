@@ -8,7 +8,6 @@ import {
   Copy,
   Check,
   LoaderCircle,
-  HeartCrack,
   Frown,
 } from "lucide-vue-next";
 
@@ -52,11 +51,15 @@ const {
       Authorization: `tma ${initDataRaw.value}`,
     },
   });
-  console.log(res);
+
+  if (!res.data.value) {
+    console.error(res.data);
+    throw new Error("error fetching data");
+  }
 
   let id = 1;
   let notes: Note[] = [];
-  res.data.value?.forEach(async (s) => {
+  res.data.value.forEach(async (s) => {
     const decrypted = await decrypt(dek, s.ivB64, s.value, chatId);
     notes.push({
       id: s.id ?? id++,
@@ -69,6 +72,7 @@ const {
 
   return notes;
 });
+if (error) console.error(error)
 
 function back() {
   return navigateTo("/telegram");
