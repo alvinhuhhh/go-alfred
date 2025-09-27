@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      devMode: 1,
+      devMode: true,
       keyVersion: 1,
     },
   },
