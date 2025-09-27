@@ -45,7 +45,7 @@ const {
   pending,
   error,
 } = await useAsyncData<Note[]>(async () => {
-  const res = await useFetch<Secret[]>(`/api/secrets/${chatId}`, {
+  const res = await useFetch<string>(`/api/secrets/${chatId}`, {
     method: "GET",
     headers: {
       Authorization: `tma ${initDataRaw.value}`,
@@ -59,7 +59,8 @@ const {
 
   let id = 1;
   let notes: Note[] = [];
-  res.data.value.forEach(async (s) => {
+  const json: Secret[] = JSON.parse(res.data.value);
+  json.forEach(async (s: Secret) => {
     const decrypted = await decrypt(dek, s.ivB64, s.value, chatId);
     notes.push({
       id: s.id ?? id++,
@@ -72,7 +73,7 @@ const {
 
   return notes;
 });
-if (error) console.error(error)
+if (error) console.error(error);
 
 function back() {
   return navigateTo("/telegram");
