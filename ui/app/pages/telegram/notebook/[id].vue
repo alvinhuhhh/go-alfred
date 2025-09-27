@@ -12,7 +12,7 @@ import { getInitDataRaw } from "~/utils";
 
 const route = useRoute();
 
-const chatId = route.params.id;
+const chatId = route.params.id ? route.params.id : getChatId();
 const initDataRaw = getInitDataRaw();
 const isDialogOpen = ref(false);
 const isToastOpen = ref(false);

@@ -9,6 +9,7 @@ if (!appConfig.devMode && !checkTelegramEnvironment()) {
 }
 
 const chatId = getChatId();
+console.log(chatId);
 
 const features = [
   {
