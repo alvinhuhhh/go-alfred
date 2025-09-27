@@ -137,6 +137,15 @@ func (s service) HandleCallbackQuery(ctx context.Context, b *bot.Bot, update *mo
 		return
 	}
 
+	// Delete existing message
+	if _, err := b.DeleteMessage(ctx, &bot.DeleteMessageParams{
+		ChatID: update.CallbackQuery.Message.Message.Chat.ID,
+		MessageID: update.CallbackQuery.Message.Message.ID,
+	}); err != nil {
+		slog.Error(err.Error())
+		return
+	}
+
 	// Send response
 	message, err := b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:      update.CallbackQuery.Message.Message.Chat.ID,
@@ -146,6 +155,7 @@ func (s service) HandleCallbackQuery(ctx context.Context, b *bot.Bot, update *mo
 	})
 	if err != nil {
 		slog.Error(err.Error())
+		return
 	}
 
 	// Append message ID
