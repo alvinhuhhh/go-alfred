@@ -9,4 +9,10 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+  runtimeConfig: {
+    public: {
+      devMode: 1,
+      keyVersion: 1,
+    },
+  },
 });

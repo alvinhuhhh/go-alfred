@@ -8,7 +8,6 @@ import {
   Copy,
   Check,
 } from "lucide-vue-next";
-import appConfig from "~/app.config";
 
 interface Note {
   id: number;
@@ -27,6 +26,7 @@ interface Secret {
 }
 
 const route = useRoute();
+const runtimeConfig = useRuntimeConfig();
 const chatId: string = route.params.id as string;
 const initDataRaw = useState<string>("initDataRaw");
 const encryptionKey = useState<string>("encryptionKey");
@@ -93,10 +93,10 @@ async function submitNewNote() {
     key: newKey.value,
     value: ciphertext,
     chatId: parseInt(chatId),
-    keyVersion: appConfig.keyVersion,
+    keyVersion: runtimeConfig.keyVersion as number,
     ivB64: iv,
   };
-  const res = await $fetch("/secrets", {
+  const res = await $fetch("/api/secrets", {
     method: "POST",
     body: JSON.stringify(newSecret),
     headers: {
