@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log/slog"
+	"os"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
@@ -12,6 +13,7 @@ import (
 
 type Service interface {
 	Start(ctx context.Context, b *bot.Bot, update *models.Update)
+	StartApp(ctx context.Context, b *bot.Bot, update *models.Update)
 	ReplyHello(ctx context.Context, b *bot.Bot, update *models.Update)
 }
 
@@ -67,6 +69,28 @@ func (s *service) Start(ctx context.Context, b *bot.Bot, update *models.Update) 
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: update.Message.Chat.ID,
 		Text:   "Welcome back!",
+	})
+}
+
+func (s *service) StartApp(ctx context.Context, b *bot.Bot, update *models.Update) {
+	chatId := update.Message.Chat.ID
+
+	webAppUrl, found := os.LookupEnv("WEB_APP_URL")
+	if !found {
+		webAppUrl = ""
+	}
+	url := fmt.Sprintf(webAppUrl+"?startapp=%d", chatId)
+
+	b.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID: update.Message.Chat.ID,
+		Text:   "Open app to access more features",
+		ReplyMarkup: &models.InlineKeyboardMarkup{
+			InlineKeyboard: [][]models.InlineKeyboardButton{
+				{
+					{Text: "Open App", URL: url},
+				},
+			},
+		},
 	})
 }
 

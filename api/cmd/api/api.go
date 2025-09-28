@@ -113,6 +113,7 @@ func main() {
 	}
 
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/start", bot.MatchTypePrefix, chatService.Start)
+	b.RegisterHandler(bot.HandlerTypeMessageText, "/app", bot.MatchTypePrefix, chatService.ReplyHello)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/hello", bot.MatchTypePrefix, chatService.ReplyHello)
 
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/getdinner", bot.MatchTypePrefix, dinnerService.HandleDinner)
