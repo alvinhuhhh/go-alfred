@@ -112,11 +112,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	b.RegisterHandler(bot.HandlerTypeMessageText, "start", bot.MatchTypeCommand, chatService.Start)
-	b.RegisterHandler(bot.HandlerTypeMessageText, "hello", bot.MatchTypeCommand, chatService.ReplyHello)
+	b.RegisterHandler(bot.HandlerTypeMessageText, "start", bot.MatchTypePrefix, chatService.Start)
+	b.RegisterHandler(bot.HandlerTypeMessageText, "hello", bot.MatchTypePrefix, chatService.ReplyHello)
 
-	b.RegisterHandler(bot.HandlerTypeMessageText, "getdinner", bot.MatchTypeCommand, dinnerService.HandleDinner)
-	b.RegisterHandler(bot.HandlerTypeMessageText, "enddinner", bot.MatchTypeCommand, dinnerService.HandleDinner)
+	b.RegisterHandler(bot.HandlerTypeMessageText, "getdinner", bot.MatchTypePrefix, dinnerService.HandleDinner)
+	b.RegisterHandler(bot.HandlerTypeMessageText, "enddinner", bot.MatchTypePrefix, dinnerService.HandleDinner)
 	b.RegisterHandler(bot.HandlerTypeCallbackQueryData, "joindinner", bot.MatchTypePrefix, dinnerService.HandleCallbackQuery)
 	b.RegisterHandler(bot.HandlerTypeCallbackQueryData, "leavedinner", bot.MatchTypePrefix, dinnerService.HandleCallbackQuery)
 
