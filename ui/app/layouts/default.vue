@@ -3,7 +3,7 @@ const route = useRoute();
 const chatId = useState<number>("chatId", () => {
   if (import.meta.env.VITE_ENV === "production") {
     if (route.path.includes("/telegram")) {
-      return getChatId() ?? getUserId() ?? 1;
+      return getChatId();
     }
   }
   return 1;

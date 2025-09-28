@@ -18,18 +18,24 @@ const checkTelegramEnvironment = (): boolean => {
   return hasTelegramWebApp || hasTelegramParams || isTelegramUserAgent;
 };
 
-// only returned for private chats
-const getUserId = (): number | undefined => {
-  init();
-  initData.restore();
-  return initData.user()?.id;
-};
-
 // only returned for supergroups, channels and groups
-const getChatId = (): number | undefined => {
+// opened from attachment menu (not available yet)
+const getChatId = (): number => {
   init();
   initData.restore();
-  return initData.chat()?.id;
+
+  return (
+    // only returned for supergroups, channels and groups
+    // opened from attachment menu (not available yet)
+    initData.chat()?.id ??
+    // returned from ?startapp param by links generated
+    // by backend bot handler
+    parseInt(initData.startParam() as string) ??
+    // only returned for private chats
+    initData.user()?.id ??
+    // else just return
+    1
+  );
 };
 
 const getInitDataRaw = (): string | undefined => {
@@ -60,7 +66,6 @@ const setTheme = (theme: "light" | "dark"): void => {
 
 export {
   checkTelegramEnvironment,
-  getUserId,
   getChatId,
   getInitDataRaw,
   getTheme,
