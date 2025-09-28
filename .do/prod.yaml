@@ -11,14 +11,10 @@ envs:
   value: EV[1:BIVYAFZrxCoK4QJ0/cP49rS6jLab00xb:WrSuh1OmRvA5SLt+rKi4dy9HIedzcK4CwtRbUuOZQrQsSVZ3SgTn0zHpBHEtFGFOGueQ4g7BEbVJI+8ZKQg=]
 - key: DB_USER
   scope: RUN_AND_BUILD_TIME
-  value: postgres
-- key: DB_PASSWORD
-  scope: RUN_AND_BUILD_TIME
-  type: SECRET
-  value: EV[1:uiGHpZXLER8xrWQ2aVEMfQ9xDeB1ESz5:f/8fO2gWiDumpWOQZLNiWo9U4HmHQgn8r3gsfryby5Y=]
+  value: postgres.jnxggeiswfchuoishjko
 - key: DB_HOST
   scope: RUN_AND_BUILD_TIME
-  value: db.jnxggeiswfchuoishjko.supabase.co
+  value: aws-0-ap-southeast-1.pooler.supabase.com
 - key: DB_PORT
   scope: RUN_AND_BUILD_TIME
   value: "5432"
@@ -38,6 +34,10 @@ envs:
   scope: RUN_AND_BUILD_TIME
   type: SECRET
   value: EV[1:43xoxb2K8dysx/RNr3lZxCaDqdge3eaB:XUb4SpJouKASqPyxxBb8XFMWd4geHCkjvSqDi40JFoQTb+dUOcEiP96JEROlEjYG46FK1J5yki5D7Xwm]
+- key: DB_PASSWORD
+  scope: RUN_AND_BUILD_TIME
+  type: SECRET
+  value: EV[1:/ehIRDTlhWd8DejGG4m3oLvkwjM2aABL:d7YK5mZ8U/134jrpTALHh8pMzpOAWC41VdbJ4Z/1/Vk=]
 features:
 - buildpack-stack=ubuntu-22
 ingress:
