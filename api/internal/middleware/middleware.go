@@ -54,7 +54,7 @@ func Auth(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Disable Auth if not in Production
-		if os.Getenv("VITE_ENV") != "production" {
+		if os.Getenv("GO_ENV") != "production" {
 			next.ServeHTTP(w, r)
 			return
 		}

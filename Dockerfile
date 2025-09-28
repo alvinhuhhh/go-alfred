@@ -11,6 +11,10 @@ RUN npm ci
 # Copy entire project
 COPY ./ui ./
 
+# Set environment variables
+ARG VITE_ENV=production
+ARG VITE_MASTER_KEY_VERSION=1
+
 # Build the project
 RUN npm run generate
 
