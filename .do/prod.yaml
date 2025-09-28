@@ -38,6 +38,9 @@ envs:
   scope: RUN_AND_BUILD_TIME
   type: SECRET
   value: EV[1:/ehIRDTlhWd8DejGG4m3oLvkwjM2aABL:d7YK5mZ8U/134jrpTALHh8pMzpOAWC41VdbJ4Z/1/Vk=]
+- key: WEB_APP_URL
+  scope: RUN_AND_BUILD_TIME
+  value: "t.me/goalfredbot/startapp"
 features:
 - buildpack-stack=ubuntu-22
 ingress:
