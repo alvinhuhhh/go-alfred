@@ -1,22 +1,20 @@
 <script setup lang="ts">
 const route = useRoute();
 const chatId = useState<number>("chatId", () => {
-  if (
-    import.meta.env.VITE_ENV != "production" &&
-    !route.path.includes("/telegram")
-  ) {
-    return 1;
+  if (import.meta.env.VITE_ENV === "production") {
+    if (route.path.includes("/telegram")) {
+      return getChatId() ?? getUserId() ?? 1;
+    }
   }
-  return getChatId() ?? getUserId() ?? 1;
+  return 1;
 });
 const initDataRaw = useState<string>("initDataRaw", () => {
-  if (
-    import.meta.env.VITE_ENV != "production" &&
-    !route.path.includes("/telegram")
-  ) {
-    return "";
+  if (import.meta.env.VITE_ENV === "production") {
+    if (route.path.includes("/telegram")) {
+      return getInitDataRaw() ?? "";
+    }
   }
-  return getInitDataRaw() ?? "";
+  return "";
 });
 const encryptionKey = useState<string>("encryptionKey", () => {
   return "";
