@@ -15,6 +15,21 @@
 !.vscode/extensions.json
 .history/*
 
+# Nuxt dev/build outputs
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
+
+# Node dependencies
+node_modules
+
+# Logs
+logs
+*.log
+
 # Miscellaneous
 /.angular/cache
 .sass-cache/
@@ -23,10 +38,17 @@
 /libpeerconnection.log
 testem.log
 /typings
+.fleet
+.idea
 
 # System files
 .DS_Store
 Thumbs.db
+
+# Local env files
+.env
+.env.*
+!.env.example
 
 # Supabase
 /supabase

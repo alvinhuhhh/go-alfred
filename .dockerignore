@@ -1,0 +1,60 @@
+# -------------------------
+# General
+# -------------------------
+.git
+.gitignore
+README.md
+LICENSE
+*.md
+*.log
+*.env
+.env.*
+.DS_Store
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# -------------------------
+# Build artifacts
+# -------------------------
+# Go
+bin/
+dist/
+build/
+*.out
+*.exe
+*.test
+*.prof
+*.coverprofile
+*.iml
+*.idea
+.vscode
+*.swp
+
+# Nuxt build output
+.nuxt/
+.output/
+.cache/
+coverage/
+
+# -------------------------
+# Dependencies
+# -------------------------
+# Frontend dependencies
+web/node_modules/
+web/.nuxt/
+web/.output/
+web/dist/
+web/.cache/
+web/.vercel/
+web/.next/
+web/.vscode/
+web/*.log
+
+# -------------------------
+# Docker related
+# -------------------------
+Dockerfile*
+docker-compose*
+*.tar
