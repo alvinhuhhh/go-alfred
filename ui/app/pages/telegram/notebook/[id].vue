@@ -56,11 +56,14 @@ const {
     console.error(res.data);
     throw new Error("error fetching data");
   }
+  console.log(res.data.value);
 
   let id = 1;
   let notes: Note[] = [];
   const json: Secret[] = JSON.parse(res.data.value);
+  console.log(json);
   json.forEach(async (s: Secret) => {
+    console.log(s);
     const decrypted = await decrypt(dek, s.ivB64, s.value, chatId);
     notes.push({
       id: s.id ?? id++,
@@ -128,6 +131,8 @@ async function submitNewNote() {
     keyVersion: config.keyVersion as number,
     ivB64: iv,
   };
+  console.log(newSecret);
+  console.log(`stringified: ${JSON.stringify(newSecret)}`);
 
   await $fetch("/api/secrets", {
     method: "POST",
