@@ -49,6 +49,7 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+compose.yaml
 
 # Supabase
 /supabase

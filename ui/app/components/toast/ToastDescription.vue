@@ -1,6 +1,6 @@
 <script setup>
 import { ToastDescription } from "reka-ui";
-import { BadgeCheckIcon, CircleSlashIcon, InfoIcon } from "lucide-vue-next";
+import { BadgeCheckIcon, CircleAlertIcon, InfoIcon } from "lucide-vue-next";
 
 const props = defineProps({
   status: "success" | "error" | "info",
@@ -11,7 +11,7 @@ const icon = computed(() => {
     case "success":
       return BadgeCheckIcon;
     case "error":
-      return CircleSlashIcon;
+      return CircleAlertIcon;
     case "info":
       return InfoIcon;
     default:

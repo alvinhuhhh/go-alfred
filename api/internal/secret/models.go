@@ -1,7 +1,7 @@
 package secret
 
 type Secret struct {
-	ID int64 `db:"id" json:"id"`
+	ID int64 `db:"id" json:"id,omitempty"`
 	Key string `db:"key" json:"key"`
 	Value string `db:"value" json:"value"`
 	ChatId int64 `db:"chat_id" json:"chatId"`

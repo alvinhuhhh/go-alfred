@@ -16,6 +16,7 @@ interface Note {
   key: string;
   value: string;
   isVisible: boolean;
+  isDeleteDialogOpen: boolean;
   copyIcon: Component;
 }
 
@@ -29,7 +30,6 @@ interface Secret {
 }
 
 const route = useRoute();
-const { public: config } = useRuntimeConfig();
 const chatId: string = route.params.id as string;
 const initDataRaw = useState<string>("initDataRaw");
 const encryptionKey = useState<string>("encryptionKey");
@@ -39,46 +39,50 @@ const isDialogOpen = ref(false);
 const isToastOpen = ref(false);
 const toastStatus = ref("success");
 const toastMessage = ref("");
+const notes = ref<Note[]>([]);
 
 const {
-  data: notes,
+  data: raw,
   pending,
   error,
-} = await useAsyncData<Note[]>(async () => {
-  const res = await useFetch<string>(`/api/secrets/${chatId}`, {
+  refresh,
+} = await useAsyncData<string>("notes", () =>
+  $fetch(`/api/secrets/${chatId}`, {
     method: "GET",
     headers: {
       Authorization: `tma ${initDataRaw.value}`,
     },
-  });
+  })
+);
 
-  if (!res.data.value) {
-    console.error(res.data);
-    throw new Error("error fetching data");
-  }
-  console.log(res.data.value);
+watch(
+  raw,
+  async (raw) => {
+    if (!raw) return;
+    const json = JSON.parse(raw);
 
-  let id = 1;
-  let notes: Note[] = [];
-  const json: Secret[] = JSON.parse(res.data.value);
-  console.log(json);
-  json.forEach(async (s: Secret) => {
-    console.log(s);
-    const decrypted = await decrypt(dek, s.ivB64, s.value, chatId);
-    notes.push({
-      id: s.id ?? id++,
-      key: s.key,
-      value: decrypted,
-      isVisible: false,
-      copyIcon: Copy,
-    });
-  });
+    let id = 1;
+    const arr = await Promise.all(
+      json.map(async (s: Secret) => {
+        const decrypted = await decrypt(dek, s.ivB64, s.value, chatId);
+        return {
+          id: s.id ?? id++,
+          key: s.key,
+          value: decrypted,
+          isVisible: false,
+          isDeleteDialogOpen: false,
+          copyIcon: Copy,
+        };
+      })
+    );
 
-  return notes;
-});
-if (error) console.error(error);
+    notes.value = arr;
+  },
+  { immediate: true }
+);
 
 function back() {
+  clearDialog();
   return navigateTo("/telegram");
 }
 
@@ -92,7 +96,13 @@ function toggleValueVisibility(id: number) {
 }
 
 function setIsDialogOpen() {
+  clearDialog();
   isDialogOpen.value = !isDialogOpen.value;
+}
+
+function setIsDeleteDialogOpen(noteId: number) {
+  const note = notes.value?.find((n) => n.id === noteId);
+  if (note) note.isDeleteDialogOpen = !note.isDeleteDialogOpen;
 }
 
 async function copyValue(id: number) {
@@ -120,6 +130,10 @@ async function copyValue(id: number) {
 
 const newKey = ref("");
 const newValue = ref("");
+function clearDialog() {
+  newKey.value = "";
+  newValue.value = "";
+}
 async function submitNewNote() {
   const { iv, ciphertext } = await encrypt(dek, newValue.value, chatId);
 
@@ -128,30 +142,56 @@ async function submitNewNote() {
     key: newKey.value,
     value: ciphertext,
     chatId: parseInt(chatId),
-    keyVersion: config.keyVersion as number,
+    keyVersion: parseInt(import.meta.env.VITE_MASTER_KEY_VERSION) as number,
     ivB64: iv,
   };
-  console.log(newSecret);
-  console.log(`stringified: ${JSON.stringify(newSecret)}`);
 
-  await $fetch("/api/secrets", {
-    method: "POST",
-    body: JSON.stringify(newSecret),
-    headers: {
-      Authorization: `tma ${initDataRaw.value}`,
-    },
-  }).catch((err) => {
+  try {
+    await $fetch("/api/secrets", {
+      method: "POST",
+      body: JSON.stringify(newSecret),
+      headers: {
+        Authorization: `tma ${initDataRaw.value}`,
+      },
+    });
+  } catch (err) {
+    clearDialog();
     isDialogOpen.value = false;
     isToastOpen.value = true;
     toastStatus.value = "error";
-    toastMessage.value = "An error occurred, failed to add new note";
+    toastMessage.value = "Failed to add new note";
     return;
-  });
+  }
 
+  clearDialog();
   isDialogOpen.value = false;
   isToastOpen.value = true;
   toastStatus.value = "success";
   toastMessage.value = "New note added!";
+  await refresh();
+}
+
+async function deleteNote(noteId: number) {
+  try {
+    await $fetch(`/api/secrets/${noteId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `tma ${initDataRaw.value}`,
+      },
+    });
+  } catch (err) {
+    setIsDeleteDialogOpen(noteId);
+    isToastOpen.value = true;
+    toastStatus.value = "error";
+    toastMessage.value = "Failed to delete note";
+    return;
+  }
+
+  setIsDeleteDialogOpen(noteId);
+  isToastOpen.value = true;
+  toastStatus.value = "success";
+  toastMessage.value = "Note deleted";
+  await refresh();
 }
 </script>
 
@@ -222,19 +262,76 @@ async function submitNewNote() {
     <!-- Notes List -->
     <div class="p-4">
       <div class="max-w-md mx-auto space-y-3">
+        <!-- Error state -->
+        <div v-if="error" class="flex flex-col items-center py-12">
+          <Frown class="w-8 h-8 text-muted-foreground mb-2" />
+          <p class="text-muted-foreground">An error occurred</p>
+        </div>
+
+        <!-- Pending state -->
+        <div v-else-if="pending" class="flex flex-col items-center py-12">
+          <LoaderCircle
+            class="w-8 h-8 text-muted-foreground animate-spin mb-2"
+          />
+          <p class="text-muted-foreground">Loading</p>
+        </div>
+
+        <!-- Empty state -->
+        <div v-else-if="notes && notes.length === 0" class="text-center py-12">
+          <p class="text-muted-foreground mb-4">No notes yet</p>
+          <Button @click="setIsDialogOpen">
+            <Plus class="w-4 h-4 mr-2" />
+            Add your first note
+          </Button>
+        </div>
+
+        <!-- Populate list -->
         <Card v-for="note in notes" :key="note.id" class="p-4">
           <div class="flex items-start justify-between mb-2">
             <h3 class="font-medium text-foreground overflow-hidden">
               {{ note.key }}
             </h3>
-            <Button
-              variant="ghost"
-              size="sm"
-              class="text-destructive hover:text-destructive p-1"
-            >
-              <Trash2 class="w-4 h-4" />
-            </Button>
+
+            <!-- Delete Dialog -->
+            <Dialog :open="note.isDeleteDialogOpen">
+              <DialogTrigger as-child>
+                <Button
+                  @click="setIsDeleteDialogOpen(note.id)"
+                  variant="ghost"
+                  size="sm"
+                  class="text-destructive hover:text-destructive p-1"
+                >
+                  <Trash2 class="w-4 h-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent @dialog-close="setIsDeleteDialogOpen(note.id)">
+                <form @submit.prevent="deleteNote(note.id)">
+                  <DialogHeader>
+                    <DialogTitle>Delete Note</DialogTitle>
+                  </DialogHeader>
+                  <div class="space-y-4 py-4">
+                    <p class="text-muted-foreground">
+                      Are you sure you want to delete "{{ note.key }}"? This
+                      action cannot be undone.
+                    </p>
+                  </div>
+                  <div class="flex space-x-2 pt-2">
+                    <Button variant="destructive" class="flex-1" type="submit"
+                      >Delete</Button
+                    >
+                    <Button
+                      variant="outline"
+                      class="flex-1"
+                      @click="setIsDeleteDialogOpen(note.id)"
+                      type="reset"
+                      >Cancel</Button
+                    >
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
+
           <div class="flex items-center space-x-2 mb-2">
             <code
               class="flex-1 text-sm overflow-auto bg-muted p-2 rounded font-mono"
@@ -260,29 +357,6 @@ async function submitNewNote() {
             </Button>
           </div>
         </Card>
-
-        <!-- Error state -->
-        <div v-if="error" class="flex flex-col items-center py-12">
-          <Frown class="w-8 h-8 text-muted-foreground mb-2" />
-          <p class="text-muted-foreground">An error occurred</p>
-        </div>
-
-        <!-- Pending state -->
-        <div v-else-if="pending" class="flex flex-col items-center py-12">
-          <LoaderCircle
-            class="w-8 h-8 text-muted-foreground animate-spin mb-2"
-          />
-          <p class="text-muted-foreground">Loading</p>
-        </div>
-
-        <!-- Empty state -->
-        <div v-else-if="!notes" class="text-center py-12">
-          <p class="text-muted-foreground mb-4">No notes yet</p>
-          <Button @click="setIsDialogOpen">
-            <Plus class="w-4 h-4 mr-2" />
-            Add your first note
-          </Button>
-        </div>
       </div>
     </div>
 

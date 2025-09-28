@@ -3,7 +3,7 @@ import { init } from "@telegram-apps/sdk-vue";
 import { BookOpen, Settings, Sparkles } from "lucide-vue-next";
 
 const chatId = useState<number>("chatId");
-if (!import.meta.dev && !checkTelegramEnvironment()) {
+if (import.meta.env.VITE_ENV == "production" && !checkTelegramEnvironment()) {
   try {
     init();
   } catch (err) {

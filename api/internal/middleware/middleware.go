@@ -1,11 +1,12 @@
 package middleware
 
 import (
-	"slices"
 	"context"
 	"fmt"
 	"log/slog"
 	"net/http"
+	"os"
+	"slices"
 	"strings"
 	"time"
 
@@ -52,6 +53,12 @@ func Auth(next http.Handler) http.Handler {
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Disable Auth if not in Production
+		if os.Getenv("VITE_ENV") != "production" {
+			next.ServeHTTP(w, r)
+			return
+		}
+
 		// Allow routes in whitelist
 		if slices.Contains(whitelist, r.URL.Path) {
 			next.ServeHTTP(w, r)

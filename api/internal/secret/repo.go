@@ -21,7 +21,7 @@ func NewRepo(db *sqlx.DB) (Repo, error) {
 }
 
 func (r repo) GetSecretsForChatId(ctx context.Context, id int64, limit, offset int) (*[]Secret, error) {
-	query := "SELECT id, key, value, chat_id, key_version, iv_b64 FROM secrets WHERE chat_id = ? ORDER BY id LIMIT ? OFFSET ?"
+	query := "SELECT id, key, value, chat_id, key_version, iv_b64 FROM secrets WHERE chat_id = ? ORDER BY id DESC LIMIT ? OFFSET ?"
 	query = r.db.Rebind(query)
 	s := []Secret{}
 	err := r.db.SelectContext(ctx, &s, query, id, limit, offset)

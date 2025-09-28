@@ -34,9 +34,9 @@ func DeriveDEK(masterKey []byte, keyVersion uint64, chatId int64) ([]byte, error
 }
 
 func GetKeyVersion() (uint64, error) {
-	value, found := os.LookupEnv("MASTER_KEY_VERSION")
+	value, found := os.LookupEnv("VITE_MASTER_KEY_VERSION")
 	if !found {
-		return 0, errors.New("MASTER_KEY_VERSION is not found")
+		return 0, errors.New("VITE_MASTER_KEY_VERSION is not found")
 	}
 	v, err := strconv.ParseUint(value, 10, 64)
 	if err != nil {

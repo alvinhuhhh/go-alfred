@@ -28,7 +28,10 @@ envs:
 - key: TELEGRAM_TEST_SERVER
   scope: RUN_AND_BUILD_TIME
   value: "1"
-- key: MASTER_KEY_VERSION
+- key: VITE_ENV
+  scope: RUN_AND_BUILD_TIME
+  value: "production"
+- key: VITE_MASTER_KEY_VERSION
   scope: RUN_AND_BUILD_TIME
   value: "1"
 - key: MASTER_KEY_V1

@@ -1,13 +1,13 @@
 <script setup lang="ts">
-const { public: config } = useRuntimeConfig();
+const route = useRoute();
 const chatId = useState<number>("chatId", () => {
-  if (import.meta.dev) {
+  if (import.meta.env.VITE_ENV != "production") {
     return 1;
   }
   return getChatId() ?? getUserId() ?? 1;
 });
 const initDataRaw = useState<string>("initDataRaw", () => {
-  if (import.meta.dev) {
+  if (import.meta.env.VITE_ENV != "production") {
     return "";
   }
   return getInitDataRaw() ?? "";
@@ -18,13 +18,13 @@ const encryptionKey = useState<string>("encryptionKey", () => {
 
 onMounted(async () => {
   setTheme(getTheme());
-  encryptionKey.value = import.meta.dev
-    ? "+tuHPldsy0hy16yebxkQsmlHiZKkhlq3gzm447tWdkQ="
-    : await fetchEncryptionKey(
-        config.keyVersion as number,
-        chatId.value,
-        initDataRaw.value
-      );
+  if (route.path.includes("/telegram")) {
+    encryptionKey.value = await fetchEncryptionKey(
+      import.meta.env.VITE_MASTER_KEY_VERSION as number,
+      chatId.value,
+      initDataRaw.value
+    );
+  }
 });
 </script>
 
