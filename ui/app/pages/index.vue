@@ -33,7 +33,7 @@ const features = [
 ];
 
 function handleGetStarted() {
-  console.log("get-started");
+  navigateTo("https://t.me/goalfredbot", { external: true });
 }
 </script>
 
