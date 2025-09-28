@@ -11,6 +11,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        
       - name: Deploy to DigitalOcean
         uses: digitalocean/app_action/deploy@v2
         with:
