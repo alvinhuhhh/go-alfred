@@ -1,0 +1,63 @@
+alerts:
+- rule: DEPLOYMENT_FAILED
+- rule: DOMAIN_FAILED
+envs:
+- key: PORT
+  scope: RUN_AND_BUILD_TIME
+  value: "8080"
+- key: BOT_TOKEN
+  scope: RUN_AND_BUILD_TIME
+  type: SECRET
+  value: EV[1:BIVYAFZrxCoK4QJ0/cP49rS6jLab00xb:WrSuh1OmRvA5SLt+rKi4dy9HIedzcK4CwtRbUuOZQrQsSVZ3SgTn0zHpBHEtFGFOGueQ4g7BEbVJI+8ZKQg=]
+- key: DB_USER
+  scope: RUN_AND_BUILD_TIME
+  value: postgres
+- key: DB_PASSWORD
+  scope: RUN_AND_BUILD_TIME
+  type: SECRET
+  value: EV[1:uiGHpZXLER8xrWQ2aVEMfQ9xDeB1ESz5:f/8fO2gWiDumpWOQZLNiWo9U4HmHQgn8r3gsfryby5Y=]
+- key: DB_HOST
+  scope: RUN_AND_BUILD_TIME
+  value: db.jnxggeiswfchuoishjko.supabase.co
+- key: DB_PORT
+  scope: RUN_AND_BUILD_TIME
+  value: "5432"
+- key: DB_NAME
+  scope: RUN_AND_BUILD_TIME
+  value: postgres
+- key: TELEGRAM_TEST_SERVER
+  scope: RUN_AND_BUILD_TIME
+  value: "0"
+- key: GO_ENV
+  scope: RUN_AND_BUILD_TIME
+  value: production
+- key: MASTER_KEY_VERSION
+  scope: RUN_AND_BUILD_TIME
+  value: "1"
+- key: MASTER_KEY_V1
+  scope: RUN_AND_BUILD_TIME
+  type: SECRET
+  value: EV[1:43xoxb2K8dysx/RNr3lZxCaDqdge3eaB:XUb4SpJouKASqPyxxBb8XFMWd4geHCkjvSqDi40JFoQTb+dUOcEiP96JEROlEjYG46FK1J5yki5D7Xwm]
+features:
+- buildpack-stack=ubuntu-22
+ingress:
+  rules:
+  - component:
+      name: go-alfred
+    match:
+      authority:
+        exact: ""
+      path:
+        prefix: /
+name: go-alfred
+region: sgp
+services:
+- http_port: 8080
+  image:
+    registry: alvinhuhhh
+    registry_type: GHCR
+    repository: go-alfred
+    tag: latest
+  instance_count: 1
+  instance_size_slug: apps-s-1vcpu-0.5gb
+  name: go-alfred
