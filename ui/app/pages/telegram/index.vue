@@ -2,6 +2,8 @@
 import { init } from "@telegram-apps/sdk-vue";
 import { BookOpen, Settings, Sparkles } from "lucide-vue-next";
 
+const { public: config } = useRuntimeConfig();
+
 const chatId = useState<number>("chatId");
 if (import.meta.env.VITE_ENV == "production" && !checkTelegramEnvironment()) {
   try {
@@ -119,7 +121,7 @@ function handleFeatureClick(id: string) {
       <!-- Footer -->
       <div class="mt-12 text-center">
         <p class="text-xs text-muted-foreground">
-          Alfred v1.0 - Your digital butler
+          Alfred v{{ config.appVersion }} - Your digital butler
         </p>
       </div>
     </div>

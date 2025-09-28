@@ -1,4 +1,5 @@
 import tailwindcss from "@tailwindcss/vite";
+import { version } from "./package.json";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -9,11 +10,16 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+  runtimeConfig: {
+    public: {
+      appVersion: version,
+    },
+  },
   nitro: {
     devProxy: {
-      '/api': {
-        target: 'http://localhost:8080/api'
-      }
-    }
-  }
+      "/api": {
+        target: "http://localhost:8080/api",
+      },
+    },
+  },
 });

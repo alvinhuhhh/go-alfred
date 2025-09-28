@@ -130,6 +130,9 @@ async function copyValue(id: number) {
 
 const newKey = ref("");
 const newValue = ref("");
+const isSubmitDisabled = computed(() => {
+  return !newKey.value || !newValue.value;
+});
 function clearDialog() {
   newKey.value = "";
   newValue.value = "";
@@ -226,7 +229,7 @@ async function deleteNote(noteId: number) {
               </DialogHeader>
               <div class="space-y-4 pt-4">
                 <div>
-                  <Label htmlFor="key">Key</Label>
+                  <Label htmlFor="key">Name</Label>
                   <Input
                     id="key"
                     placeholder="e.g., WiFi Password"
@@ -242,7 +245,13 @@ async function deleteNote(noteId: number) {
                   />
                 </div>
                 <div class="flex space-x-2 pt-2">
-                  <Button class="flex-1" type="submit"> Add Note </Button>
+                  <Button
+                    class="flex-1"
+                    type="submit"
+                    :disabled="isSubmitDisabled"
+                  >
+                    Add Note
+                  </Button>
                   <Button
                     variant="outline"
                     class="flex-1"

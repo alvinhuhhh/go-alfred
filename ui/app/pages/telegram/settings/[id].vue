@@ -1,6 +1,8 @@
 <script setup>
 import { ArrowLeft, Moon, Sun, MessageSquare, Clock } from "lucide-vue-next";
 
+const { public: config } = useRuntimeConfig();
+
 const scheduleEnabled = ref(true);
 const scheduleTime = ref(null);
 const scheduleFrequency = ref(null);
@@ -206,7 +208,7 @@ function toggleTheme() {
         <Card class="p-6 bg-transparent">
           <h3 class="font-medium mb-3">About Alfred</h3>
           <div class="space-y-2 text-sm text-muted-foreground">
-            <p>Version 1.0.0</p>
+            <p>Version {{ config.appVersion }}</p>
             <p>Built for family organization and management</p>
             <p>Telegram Mini App</p>
           </div>
