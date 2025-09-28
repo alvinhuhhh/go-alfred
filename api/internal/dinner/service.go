@@ -51,8 +51,7 @@ func (s service) HandleDinner(ctx context.Context, b *bot.Bot, update *models.Up
 	}
 	command := update.Message.Text
 
-	switch command {
-	case "/getdinner":
+	if strings.HasPrefix(command, "/getdinner") {
 		d, err := s.getOrInsertDinner(ctx, b, update)
 		if err != nil {
 			slog.Error("error getting dinner")
@@ -65,8 +64,7 @@ func (s service) HandleDinner(ctx context.Context, b *bot.Bot, update *models.Up
 			ReplyMarkup: s.getKeyboard(d.ID),
 		})
 		return
-
-	case "/enddinner":
+	} else if strings.HasPrefix(command, "/enddinner") {
 		d, err := s.getOrInsertDinner(ctx, b, update)
 		if err != nil {
 			slog.Error("error getting dinner")
@@ -86,8 +84,8 @@ func (s service) HandleDinner(ctx context.Context, b *bot.Bot, update *models.Up
 			Text:   "No more dinner for tonight!",
 		})
 		return
-
-	default:
+	} else {
+		slog.Error("unknown command")
 		return
 	}
 }
@@ -139,7 +137,7 @@ func (s service) HandleCallbackQuery(ctx context.Context, b *bot.Bot, update *mo
 
 	// Delete existing message
 	if _, err := b.DeleteMessage(ctx, &bot.DeleteMessageParams{
-		ChatID: update.CallbackQuery.Message.Message.Chat.ID,
+		ChatID:    update.CallbackQuery.Message.Message.Chat.ID,
 		MessageID: update.CallbackQuery.Message.Message.ID,
 	}); err != nil {
 		slog.Error(err.Error())
