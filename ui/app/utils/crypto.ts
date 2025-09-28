@@ -99,7 +99,8 @@ const decrypt = async (
       key,
       base64ToArrayBuffer(ciphertext)
     );
-    return new TextDecoder("utf-8").decode(plaintext);
+    const b64 = arrayBufferToBase64(plaintext);
+    return window.atob(b64);
   } catch (err: any) {
     console.error(err);
     throw new Error("decryption failed");

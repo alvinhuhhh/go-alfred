@@ -343,7 +343,7 @@ async function deleteNote(noteId: number) {
 
           <div class="flex items-center space-x-2 mb-2">
             <code
-              class="flex-1 text-sm overflow-auto bg-muted p-2 rounded font-mono"
+              class="flex-1 text-sm overflow-auto bg-muted p-2 rounded font-mono whitespace-nowrap"
             >
               {{ formatValue(note.value, note.isVisible) }}
             </code>
