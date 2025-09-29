@@ -40,7 +40,7 @@ envs:
   value: EV[1:ud7zUpntNc4lGUSL8dXsWc2BarE3Hf+V:8Tlxx7dWUtLMthe8Qza1VLQWsHlaNKAf28XEGQS6zGPMuBMiDm+epl8iJIZibg9H4RCE5B4WMnDBPtGM]
 - key: WEB_APP_URL
   scope: RUN_AND_BUILD_TIME
-  value: "https://go-alfred-dev-vm7h8.ondigitalocean.app/telegram"
+  value: "t.me/alfred_tan_bot/startapp"
 features:
 - buildpack-stack=ubuntu-22
 ingress:

@@ -18,24 +18,26 @@ const checkTelegramEnvironment = (): boolean => {
   return hasTelegramWebApp || hasTelegramParams || isTelegramUserAgent;
 };
 
-// only returned for supergroups, channels and groups
-// opened from attachment menu (not available yet)
 const getChatId = (): number => {
-  init();
-  initData.restore();
+  try {
+    init();
+    initData.restore();
 
-  return (
-    // only returned for supergroups, channels and groups
-    // opened from attachment menu (not available yet)
-    initData.chat()?.id ??
-    // returned from ?startapp param by links generated
-    // by backend bot handler
-    parseInt(initData.startParam() as string) ??
-    // only returned for private chats
-    initData.user()?.id ??
-    // else just return
-    1
-  );
+    return (
+      // returned from ?startapp param by links generated
+      // by backend bot handler
+      parseInt(initData.startParam() as string) ??
+      // only returned for supergroups, channels and groups
+      // opened from attachment menu (not available yet)
+      initData.chat()?.id ??
+      // only returned for private chats
+      initData.user()?.id ??
+      // else just return
+      1
+    );
+  } catch (err) {
+    return 1;
+  }
 };
 
 const getInitDataRaw = (): string | undefined => {
