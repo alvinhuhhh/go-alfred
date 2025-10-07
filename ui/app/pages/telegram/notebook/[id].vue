@@ -86,6 +86,10 @@ function back() {
   return navigateTo("/telegram");
 }
 
+function renderLink(value: string, isVisible: boolean) {
+  return value.includes("https://") && isVisible;
+}
+
 function formatValue(value: string, isVisible: boolean) {
   return isVisible ? value : "*".repeat(15);
 }
@@ -345,7 +349,17 @@ async function deleteNote(noteId: number) {
             <code
               class="flex-1 text-sm overflow-auto bg-muted p-2 rounded font-mono whitespace-nowrap"
             >
-              {{ formatValue(note.value, note.isVisible) }}
+              <a
+                :href="note.value"
+                rel="noopener noreferrer"
+                class="text-primary hover:underline"
+                v-if="renderLink(note.value, note.isVisible)"
+              >
+                {{ formatValue(note.value, note.isVisible) }}
+              </a>
+              <span v-else>
+                {{ formatValue(note.value, note.isVisible) }}
+              </span>
             </code>
             <Button
               @click="toggleValueVisibility(note.id)"
