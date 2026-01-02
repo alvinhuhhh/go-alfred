@@ -48,8 +48,6 @@ ingress:
   - component:
       name: go-alfred
     match:
-      authority:
-        exact: ""
       path:
         prefix: /
 name: go-alfred
