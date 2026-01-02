@@ -2,11 +2,11 @@
   "name": "go-alfred",
   "type": "module",
   "private": true,
-  "version": "2.1.0",
+  "version": "2.2.0",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
-    "test": "npx vitest",
+    "test": "npx vitest run",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"

@@ -40,7 +40,7 @@ func (s *service) Start(ctx context.Context, b *bot.Bot, update *models.Update) 
 				Type: string(update.Message.Chat.Type),
 			})
 			if err != nil {
-				slog.Error("unable to insert new chat ", err)
+				slog.Error("unable to insert new chat")
 				b.SendMessage(ctx, &bot.SendMessageParams{
 					ChatID: update.Message.Chat.ID,
 					Text:   "Sorry! Having a bit of trouble, will be back soon!",

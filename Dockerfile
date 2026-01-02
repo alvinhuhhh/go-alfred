@@ -11,6 +11,9 @@ RUN npm ci
 # Copy entire project
 COPY ./ui ./
 
+# Run tests
+RUN npm run test
+
 # Set environment variables
 ARG VITE_ENV=production
 ARG VITE_MASTER_KEY_VERSION=1
@@ -30,6 +33,9 @@ RUN go mod download && go mod verify
 
 # Copy entire project
 COPY ./api ./
+
+# Run tests
+RUN go test -v ./...
 
 # Build the project
 RUN go build -v -o app ./cmd/api
