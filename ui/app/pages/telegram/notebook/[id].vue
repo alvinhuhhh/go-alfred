@@ -60,6 +60,7 @@ watch(
   async (raw) => {
     if (!raw) return;
     const json = JSON.parse(raw);
+    notes.value = [] // reset notes value
 
     let id = 1;
     await Promise.all(
