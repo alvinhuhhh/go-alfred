@@ -27,12 +27,11 @@ function arrayBufferToBase64(buffer: ArrayBuffer | Uint8Array) {
   // Populate binary string with the character codes of the buffer
   let binary = "";
   for (let i = 0; i < len; i++) {
-    const b = bytes[i];
-    if (b) binary += String.fromCharCode(b);
+    binary += String.fromCharCode(bytes[i] as number);
   }
 
   // Convert to string
-  return window.btoa(binary);
+  return btoa(binary);
 }
 
 async function fetchEncryptionKey(
@@ -99,8 +98,7 @@ const decrypt = async (
       key,
       base64ToArrayBuffer(ciphertext)
     );
-    const b64 = arrayBufferToBase64(plaintext);
-    return window.atob(b64);
+    return new TextDecoder().decode(plaintext);
   } catch (err: any) {
     console.error(err);
     throw new Error("decryption failed");
