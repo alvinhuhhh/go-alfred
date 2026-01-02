@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { init } from "@telegram-apps/sdk-vue";
+import { init } from "@tma.js/sdk-vue";
 import { BookOpen, Settings, Sparkles } from "lucide-vue-next";
 
 const { public: config } = useRuntimeConfig();

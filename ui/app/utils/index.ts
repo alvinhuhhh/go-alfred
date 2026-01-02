@@ -1,4 +1,4 @@
-import { init, initData } from "@telegram-apps/sdk-vue";
+import { init, initData } from "@tma.js/sdk-vue";
 
 const checkTelegramEnvironment = (): boolean => {
   // Check for Telegram WebApp API
