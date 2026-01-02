@@ -62,21 +62,28 @@ watch(
     const json = JSON.parse(raw);
 
     let id = 1;
-    const arr = await Promise.all(
-      json.map(async (s: Secret) => {
-        const decrypted = await decrypt(dek, s.ivB64, s.value, chatId);
-        return {
-          id: s.id ?? id++,
-          key: s.key,
-          value: decrypted,
-          isVisible: false,
-          isDeleteDialogOpen: false,
-          copyIcon: Copy,
-        };
+    await Promise.all(
+      json.array.foreach(async (s: Secret) => {
+        try {
+          const decrypted = await decrypt(dek, s.ivB64, s.value, chatId);
+          notes.value = [
+            ...notes.value,
+            {
+              id: s.id ?? id++,
+              key: s.key,
+              value: decrypted,
+              isVisible: false,
+              isDeleteDialogOpen: false,
+              copyIcon: Copy,
+            },
+          ];
+        } catch (err: any) {
+          isToastOpen.value = true;
+          toastStatus.value = "error";
+          toastMessage.value = `Failed to decrypt note ${s.id ?? id}`;
+        }
       })
     );
-
-    notes.value = arr;
   },
   { immediate: true }
 );
