@@ -43,6 +43,7 @@ const getChatId = (): number => {
 const getInitDataRaw = (): string | undefined => {
   init();
   initData.restore();
+  console.log(initData.raw());
   return initData.raw();
 };
 

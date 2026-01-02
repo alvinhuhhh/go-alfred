@@ -10,6 +10,7 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+  modules: ["@nuxt/test-utils/module"],
   runtimeConfig: {
     public: {
       appVersion: version,
