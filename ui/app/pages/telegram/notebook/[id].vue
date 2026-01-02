@@ -63,7 +63,7 @@ watch(
 
     let id = 1;
     await Promise.all(
-      json.foreach(async (s: Secret) => {
+      json.forEach(async (s: Secret) => {
         try {
           const decrypted = await decrypt(dek, s.ivB64, s.value, chatId);
           notes.value = [
