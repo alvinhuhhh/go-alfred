@@ -18,7 +18,7 @@
     "@vue/test-utils": "2.4.11",
     "jsdom": "27.4.0",
     "lucide-vue-next": "0.562.0",
-    "nuxt": "4.2.2",
+    "nuxt": "4.4.7",
     "reka-ui": "2.7.0",
     "tailwindcss": "4.1.18",
     "vitest": "3.2.4",
