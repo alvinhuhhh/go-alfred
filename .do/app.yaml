@@ -8,17 +8,17 @@ envs:
 - key: BOT_TOKEN
   scope: RUN_AND_BUILD_TIME
   type: SECRET
-  value: EV[1:muzPrV37YQTRQ7mMLbUvUPbXdpHca6J+:oXIX+ydyZWnnuJBDeuZv0CJqDZKJ8W+wi0Cah4SvWZ/saZJoHSNF9CxZkLq4nXy7BqBm3bRj8tup2jFS0VY=]
+  value: EV[1:sMxjwYDZ/BwZdj0K1Csjsi1euxForNS+:ba5Sh/KqBKrlFf8JYNl3czfViE7L7yNAOS/LayJdbanqGtQtC/Fx3BG4D3sqZgRUFs9Fu8FnRpdHudqqqLQ=]
 - key: DB_USER
   scope: RUN_AND_BUILD_TIME
-  value: postgres
+  value: postgres.svgdfzlmmvqkhudikzup
 - key: DB_PASSWORD
   scope: RUN_AND_BUILD_TIME
   type: SECRET
-  value: EV[1:9jVq7uWDwTIj94nnU5Gw8FXbUymKdPBj:FgJXjvqWb9LDQUlNtf4o5QijCaIgYU3QxkwV83dOCPQ=]
+  value: EV[1:3q6sQ0EH9W5zGWFQnvXAMLrLgRjGmZ7H:0yQJt3WfiXi1AiygKBgJeANAEsn9zGwdV96me2lv7Kg=]
 - key: DB_HOST
   scope: RUN_AND_BUILD_TIME
-  value: db.inhapokrmngzktjvhlju.supabase.co
+  value: aws-0-ap-southeast-1.pooler.supabase.com
 - key: DB_PORT
   scope: RUN_AND_BUILD_TIME
   value: "5432"
@@ -37,7 +37,7 @@ envs:
 - key: MASTER_KEY_V1
   scope: RUN_AND_BUILD_TIME
   type: SECRET
-  value: EV[1:ud7zUpntNc4lGUSL8dXsWc2BarE3Hf+V:8Tlxx7dWUtLMthe8Qza1VLQWsHlaNKAf28XEGQS6zGPMuBMiDm+epl8iJIZibg9H4RCE5B4WMnDBPtGM]
+  value: EV[1:hckGkaHI4lhogyIU2GIhh7vJMB1r0Ds/:5WHOYyGGgLyg8f5tToTf+J8iM1xcQu6/MYo5XbP+wmn/YRSWXyYmC1Lq9aSAVEOGd0tNgFx9LJg3M5vO]
 - key: WEB_APP_URL
   scope: RUN_AND_BUILD_TIME
   value: "t.me/alfred_tan_bot/startapp"
@@ -48,6 +48,8 @@ ingress:
   - component:
       name: alvinhuhhh-go-alfred
     match:
+      authority:
+        exact: ""
       path:
         prefix: /
 name: go-alfred-dev
@@ -60,5 +62,5 @@ services:
     repository: go-alfred
     tag: latest
   instance_count: 1
-  instance_size_slug: apps-s-1vcpu-0.5gb
+  instance_size_slug: apps-s-1vcpu-1gb
   name: alvinhuhhh-go-alfred
