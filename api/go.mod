@@ -3,7 +3,7 @@ module github.com/alvinhuhhh/go-alfred
 go 1.25.0
 
 require (
-	github.com/go-telegram/bot v1.17.0
+	github.com/go-telegram/bot v1.22.0
 	github.com/golang-migrate/migrate/v4 v4.19.1
 	github.com/gorilla/mux v1.8.1
 	github.com/jackc/pgx/v5 v5.10.0
