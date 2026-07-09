@@ -1,5 +1,5 @@
 # --- BUILD UI ---
-FROM node:25-alpine AS nuxt-build
+FROM node:26-alpine AS nuxt-build
 WORKDIR /app
 
 # Copy package.json and package-lock.json
