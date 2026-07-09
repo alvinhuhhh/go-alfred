@@ -24,7 +24,7 @@ RUN npm run generate
 
 
 # --- BUILD API ---
-FROM golang:1.25-alpine AS go-build
+FROM golang:1.26-alpine AS go-build
 WORKDIR /app
 
 # Copy go.mod and go.sum
