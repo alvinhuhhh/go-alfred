@@ -12,6 +12,8 @@ Alfred is a Telegram bot that handles repetitive administrative duties for famil
 
 - Notebook app for easy access to common resources (e.g. CDC voucher links)
 
+- This is another new feature
+
 ## Application Stack
 
 - [Telegram Bot API](https://core.telegram.org/bots/api)
