@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@nuxt/test-utils": "4.0.3",
-    "@tailwindcss/vite": "4.1.18",
+    "@tailwindcss/vite": "4.3.3",
     "@tma.js/sdk-vue": "1.0.22",
     "@vue/test-utils": "2.4.11",
     "jsdom": "27.4.0",
