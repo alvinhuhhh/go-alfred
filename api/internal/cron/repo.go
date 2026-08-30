@@ -9,6 +9,7 @@ import (
 )
 
 type Repo interface {
+	GetSchedule(ctx context.Context, jobName string) (string, error)
 	Schedule(ctx context.Context, job *CronJob) error
 	Unschedule(ctx context.Context, jobName string) error
 }
@@ -19,6 +20,14 @@ type repo struct {
 
 func NewRepo(db *sqlx.DB) (Repo, error) {
 	return &repo{db: db}, nil
+}
+
+func (r repo) GetSchedule(ctx context.Context, jobName string) (string, error) {
+	query := "SELECT schedule FROM cron.job WHERE jobname = ?"
+	query = r.db.Rebind(query)
+	var s string
+	err := r.db.GetContext(ctx, &s, query, jobName)
+	return s, err
 }
 
 func (r repo) Schedule(ctx context.Context, job *CronJob) error {

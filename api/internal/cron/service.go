@@ -1,7 +1,9 @@
 package cron
 
 import (
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"log/slog"
 	"net/http"
 
@@ -9,6 +11,7 @@ import (
 )
 
 type Service interface {
+	GetSchedule(w http.ResponseWriter, r *http.Request)
 	CreateCronJob(w http.ResponseWriter, r *http.Request)
 	RemoveCronJob(w http.ResponseWriter, r *http.Request)
 }
@@ -21,6 +24,25 @@ func NewService(r Repo) (Service, error) {
 	return &service{
 		repo: r,
 	}, nil
+}
+
+func (s service) GetSchedule(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	jobName := vars["jobName"]
+	schedule, err := s.repo.GetSchedule(r.Context(), jobName)
+	if err != nil {
+		slog.Error(err.Error())
+		slog.Error("error retrieving cron job")
+		if errors.Is(err, sql.ErrNoRows) {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{"schedule": schedule})
 }
 
 func (s service) CreateCronJob(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +68,7 @@ func (s service) RemoveCronJob(w http.ResponseWriter, r *http.Request) {
 	jobName := vars["jobName"]
 	if err := s.repo.Unschedule(r.Context(), jobName); err != nil {
 		slog.Error(err.Error())
-		slog.Error("error deleting secret")
+		slog.Error("error unscheduling cron job")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

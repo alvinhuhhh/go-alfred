@@ -157,6 +157,7 @@ func main() {
 	api.HandleFunc("/secrets", secretService.InsertSecret).Methods(http.MethodPost)
 	api.HandleFunc("/secrets/{id}", secretService.DeleteSecret).Methods(http.MethodDelete)
 
+	api.HandleFunc("/settings/cron/{jobName}", cronService.GetSchedule).Methods(http.MethodGet)
 	api.HandleFunc("/settings/cron", cronService.CreateCronJob).Methods(http.MethodPost)
 	api.HandleFunc("/settings/cron/{jobName}", cronService.RemoveCronJob).Methods(http.MethodDelete)
 
