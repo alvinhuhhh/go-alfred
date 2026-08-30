@@ -1,8 +1,12 @@
 <script setup lang="ts">
+import cronstrue from "cronstrue";
 import { ArrowLeft, Moon, Sun, MessageSquare, Clock } from "lucide-vue-next";
 
 interface Schedule {
   cron: string;
+  time: string | null;
+  frequency: string | null;
+  summary: string | null;
 }
 
 const { public: config } = useRuntimeConfig();
@@ -13,8 +17,6 @@ const initDataRaw = useState<string>("initDataRaw");
 
 const schedule = ref<Schedule>();
 const scheduleEnabled = ref(false);
-const scheduleTime = ref(null);
-const scheduleFrequency = ref(null);
 const isDarkMode = ref(getTheme() === "dark");
 
 const {
@@ -36,13 +38,14 @@ watch(
   (raw) => {
     if (!raw) return;
     const json = JSON.parse(raw);
-    schedule.value = undefined; // reset schedule value
-
     schedule.value = {
       cron: json.cron,
+      time: "00:00",
+      frequency: "daily",
+      summary: cronstrue.toString(json.cron),
     };
-    scheduleEnabled.value = true;
     console.log(schedule.value);
+    scheduleEnabled.value = true;
   },
   { immediate: true },
 );
@@ -142,7 +145,7 @@ function toggleTheme() {
               :class="!scheduleEnabled ? 'opacity-50' : ''"
             >
               <Label for="schedule-time">Time</Label>
-              <SelectRoot :value="scheduleTime" :disabled="!scheduleEnabled">
+              <SelectRoot :value="schedule?.time" :disabled="!scheduleEnabled">
                 <SelectTrigger id="schedule-time">
                   <div class="flex items-center space-x-2">
                     <Clock class="w-4 h-4" />
@@ -172,7 +175,7 @@ function toggleTheme() {
             >
               <Label for="schedule-frequency">Frequency</Label>
               <SelectRoot
-                :value="scheduleFrequency"
+                :value="schedule?.frequency"
                 :disabled="!scheduleEnabled"
               >
                 <SelectTrigger id="schedule-frequency">
@@ -199,8 +202,7 @@ function toggleTheme() {
               <p class="text-sm">
                 <span class="font-medium">Current schedule:</span> Messages will
                 be sent
-                <span class="font-medium"></span>
-                <span class="font-medium"> </span>
+                <span class="font-medium">{{ schedule?.summary }}</span>
               </p>
             </div>
           </div>

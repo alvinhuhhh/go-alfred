@@ -2,7 +2,7 @@
   "name": "go-alfred",
   "type": "module",
   "private": true,
-  "version": "2.2.0",
+  "version": "2.3.0",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
@@ -16,6 +16,8 @@
     "@tailwindcss/vite": "4.3.3",
     "@tma.js/sdk-vue": "1.0.22",
     "@vue/test-utils": "2.4.11",
+    "cron-parser": "5.10.0",
+    "cronstrue": "3.24.0",
     "jsdom": "27.4.0",
     "lucide-vue-next": "0.562.0",
     "nuxt": "4.5.1",
