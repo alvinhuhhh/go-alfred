@@ -42,9 +42,8 @@ watch(
       cron: json.cron,
       time: "00:00",
       frequency: "daily",
-      summary: cronstrue.toString(json.cron),
+      summary: cronstrue.toString(json.cron, { verbose: true }),
     };
-    console.log(schedule.value);
     scheduleEnabled.value = true;
   },
   { immediate: true },
@@ -136,7 +135,7 @@ function toggleTheme() {
                   Turn scheduled messages on or off
                 </p>
               </div>
-              <Switch id="schedule-enabled" :value="scheduleEnabled" />
+              <Switch id="schedule-enabled" v-model="scheduleEnabled" />
             </div>
 
             <!-- Time Selection -->
