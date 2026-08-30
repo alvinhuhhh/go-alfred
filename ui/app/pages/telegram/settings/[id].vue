@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import parse from "cron-parser";
 import cronstrue from "cronstrue";
 import { ArrowLeft, Moon, Sun, MessageSquare, Clock } from "lucide-vue-next";
 
@@ -43,10 +44,12 @@ watch(
   (raw) => {
     if (!raw) return;
     const json = JSON.parse(raw);
+    const { time, frequency } = parseCron(json.cron);
+
     schedule.value = {
       cron: json.cron,
-      time: "00:00",
-      frequency: "daily",
+      time: time,
+      frequency: frequency,
       summary: cronstrue.toString(json.cron, { verbose: true }),
     };
     scheduleEnabled.value = true;
@@ -86,6 +89,24 @@ const frequencyOptions = [
   { value: "weekdays", label: "Weekdays Only" },
   { value: "weekends", label: "Weekends Only" },
 ];
+
+function parseCron(cron: string) {
+  try {
+    const interval = parse.parse(cron);
+    const nextDate = interval.next().toDate();
+    const time = nextDate.toLocaleTimeString("en-SG", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+
+    let frequency = "daily";
+    return { time, frequency };
+  } catch (err) {
+    console.error("Invalid cron expression", err);
+    return { time: "00:00", frequency: "daily" };
+  }
+}
 
 function back() {
   return navigateTo("/telegram");
