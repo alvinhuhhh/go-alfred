@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 type Service interface {
@@ -40,7 +42,8 @@ func (s service) CreateCronJob(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s service) RemoveCronJob(w http.ResponseWriter, r *http.Request) {
-	jobName := r.PathValue("jobName")
+	vars := mux.Vars(r)
+	jobName := vars["jobName"]
 	if err := s.repo.Unschedule(r.Context(), jobName); err != nil {
 		slog.Error(err.Error())
 		slog.Error("error deleting secret")
