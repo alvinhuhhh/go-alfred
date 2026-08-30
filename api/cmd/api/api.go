@@ -158,6 +158,7 @@ func main() {
 	api.HandleFunc("/secrets/{id}", secretService.DeleteSecret).Methods(http.MethodDelete)
 
 	api.HandleFunc("/settings/cron", cronService.CreateCronJob).Methods(http.MethodPost)
+	api.HandleFunc("/settings/cron/{jobName}", cronService.RemoveCronJob).Methods(http.MethodDelete)
 
 	// Web router
 	web := router.NewRoute().Subrouter()

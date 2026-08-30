@@ -10,7 +10,7 @@ import (
 
 type Repo interface {
 	Schedule(ctx context.Context, job *CronJob) error
-	Unschedule(ctx context.Context, jobname string) error
+	Unschedule(ctx context.Context, jobName string) error
 }
 
 type repo struct {
@@ -48,10 +48,10 @@ func (r repo) Schedule(ctx context.Context, job *CronJob) error {
 	return nil
 }
 
-func (r repo) Unschedule(ctx context.Context, jobname string) error {
+func (r repo) Unschedule(ctx context.Context, jobName string) error {
 	query := "SELECT cron.unschedule(?)"
 	query = r.db.Rebind(query)
-	_, err := r.db.ExecContext(ctx, query, jobname)
+	_, err := r.db.ExecContext(ctx, query, jobName)
 	if err != nil {
 		return err
 	}

@@ -8,6 +8,7 @@ import (
 
 type Service interface {
 	CreateCronJob(w http.ResponseWriter, r *http.Request)
+	RemoveCronJob(w http.ResponseWriter, r *http.Request)
 }
 
 type service struct {
@@ -32,6 +33,17 @@ func (s service) CreateCronJob(w http.ResponseWriter, r *http.Request) {
 	if err := s.repo.Schedule(r.Context(), &job); err != nil {
 		slog.Error(err.Error())
 		slog.Error("unable to schedule CronJob")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func (s service) RemoveCronJob(w http.ResponseWriter, r *http.Request) {
+	jobName := r.PathValue("jobName")
+	if err := s.repo.Unschedule(r.Context(), jobName); err != nil {
+		slog.Error(err.Error())
+		slog.Error("error deleting secret")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
