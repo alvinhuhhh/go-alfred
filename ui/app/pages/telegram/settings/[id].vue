@@ -1,7 +1,33 @@
-<script setup>
+<script setup lang="ts">
 import { ArrowLeft, Moon, Sun, MessageSquare, Clock } from "lucide-vue-next";
 
 const { public: config } = useRuntimeConfig();
+
+const route = useRoute();
+const chatId: string = route.params.id as string;
+const initDataRaw = useState<string>("initDataRaw");
+
+const cron = ref<string>("");
+
+const {
+  data: raw,
+  pending,
+  error,
+  refresh,
+} = await useAsyncData<string>("cron", () =>
+  $fetch(`/api/settings/cron/dinner-${chatId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `tma ${initDataRaw.value}`,
+    },
+  }),
+);
+
+watch(raw, async (raw) => {
+  if (!raw) return;
+  console.log(raw);
+  console.log(cron.value);
+});
 
 const scheduleEnabled = ref(true);
 const scheduleTime = ref(null);
