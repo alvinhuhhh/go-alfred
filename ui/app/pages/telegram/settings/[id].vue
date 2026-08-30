@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { ArrowLeft, Moon, Sun, MessageSquare, Clock } from "lucide-vue-next";
 
+interface Schedule {
+  cron: string;
+}
+
 const { public: config } = useRuntimeConfig();
 
 const route = useRoute();
 const chatId: string = route.params.id as string;
 const initDataRaw = useState<string>("initDataRaw");
 
-const cron = ref<string>("");
+const schedule = ref<Schedule>();
 
 const {
   data: raw,
@@ -23,18 +27,34 @@ const {
   }),
 );
 
-watch(raw, async (raw) => {
-  if (!raw) return;
-  console.log(raw);
-  console.log(cron.value);
-});
+watch(
+  raw,
+  (raw) => {
+    if (!raw) return;
+    const json = JSON.parse(raw);
+    schedule.value = undefined; // reset schedule value
 
-const scheduleEnabled = ref(true);
+    schedule.value = {
+      cron: json.cron,
+    };
+    scheduleEnabled.value = true;
+    console.log(schedule.value);
+  },
+  { immediate: true },
+);
+
+const scheduleEnabled = ref(false);
 const scheduleTime = ref(null);
 const scheduleFrequency = ref(null);
 const isDarkMode = ref(getTheme() === "dark");
 
 const timeOptions = [
+  { value: "00:00", label: "0:00 AM" },
+  { value: "01:00", label: "1:00 AM" },
+  { value: "02:00", label: "2:00 AM" },
+  { value: "03:00", label: "3:00 AM" },
+  { value: "04:00", label: "4:00 AM" },
+  { value: "05:00", label: "5:00 AM" },
   { value: "06:00", label: "6:00 AM" },
   { value: "07:00", label: "7:00 AM" },
   { value: "08:00", label: "8:00 AM" },
@@ -52,19 +72,13 @@ const timeOptions = [
   { value: "20:00", label: "8:00 PM" },
   { value: "21:00", label: "9:00 PM" },
   { value: "22:00", label: "10:00 PM" },
+  { value: "23:00", label: "11:00 PM" },
 ];
 
 const frequencyOptions = [
   { value: "daily", label: "Daily" },
   { value: "weekdays", label: "Weekdays Only" },
   { value: "weekends", label: "Weekends Only" },
-  { value: "monday", label: "Every Monday" },
-  { value: "tuesday", label: "Every Tuesday" },
-  { value: "wednesday", label: "Every Wednesday" },
-  { value: "thursday", label: "Every Thursday" },
-  { value: "friday", label: "Every Friday" },
-  { value: "saturday", label: "Every Saturday" },
-  { value: "sunday", label: "Every Sunday" },
 ];
 
 function back() {
