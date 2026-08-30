@@ -14,6 +14,7 @@ import (
 
 	"github.com/alvinhuhhh/go-alfred/internal/chat"
 	"github.com/alvinhuhhh/go-alfred/internal/config"
+	"github.com/alvinhuhhh/go-alfred/internal/cron"
 	"github.com/alvinhuhhh/go-alfred/internal/dinner"
 	"github.com/alvinhuhhh/go-alfred/internal/handlers"
 	"github.com/alvinhuhhh/go-alfred/internal/middleware"
@@ -112,6 +113,15 @@ func main() {
 		log.Fatal(err)
 	}
 
+	cronRepo, err := cron.NewRepo(db)
+	if err != nil {
+		log.Fatal(err)
+	}
+	cronService, err := cron.NewService(cronRepo)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/start", bot.MatchTypePrefix, chatService.Start)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/app", bot.MatchTypePrefix, chatService.StartApp)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/hello", bot.MatchTypePrefix, chatService.ReplyHello)
@@ -146,6 +156,8 @@ func main() {
 	api.HandleFunc("/secrets/{chatId}", secretService.GetSecretsForChatId).Methods(http.MethodGet)
 	api.HandleFunc("/secrets", secretService.InsertSecret).Methods(http.MethodPost)
 	api.HandleFunc("/secrets/{id}", secretService.DeleteSecret).Methods(http.MethodDelete)
+
+	api.HandleFunc("/settings/cron", cronService.CreateCronJob).Methods(http.MethodPost)
 
 	// Web router
 	web := router.NewRoute().Subrouter()

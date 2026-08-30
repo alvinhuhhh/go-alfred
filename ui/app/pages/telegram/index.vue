@@ -29,7 +29,7 @@ const features = [
     description: "Configure Alfred preferences",
     icon: Settings,
     color: "bg-gray-50 dark:bg-gray-950 text-gray-600 dark:text-gray-400",
-    available: false,
+    available: true,
   },
   {
     id: "more",
