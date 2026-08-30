@@ -4,8 +4,8 @@ import { ArrowLeft, Moon, Sun, MessageSquare, Clock } from "lucide-vue-next";
 
 interface Schedule {
   cron: string;
-  time: string | null;
-  frequency: string | null;
+  time: string;
+  frequency: string;
   summary: string | null;
 }
 
@@ -15,7 +15,12 @@ const route = useRoute();
 const chatId: string = route.params.id as string;
 const initDataRaw = useState<string>("initDataRaw");
 
-const schedule = ref<Schedule>();
+const schedule = ref<Schedule>({
+  cron: "0 * * * *",
+  time: "00:00",
+  frequency: "daily",
+  summary: "",
+});
 const scheduleEnabled = ref(false);
 const isDarkMode = ref(getTheme() === "dark");
 
@@ -89,6 +94,10 @@ function back() {
 function toggleTheme() {
   setTheme(getTheme() === "light" ? "dark" : "light");
 }
+
+function saveSettings() {
+  console.log(schedule.value);
+}
 </script>
 
 <template>
@@ -144,11 +153,7 @@ function toggleTheme() {
               :class="!scheduleEnabled ? 'opacity-50' : ''"
             >
               <Label for="schedule-time">Time</Label>
-              <SelectRoot
-                v-if="schedule"
-                v-model="schedule.time"
-                :disabled="!scheduleEnabled"
-              >
+              <SelectRoot v-model="schedule.time" :disabled="!scheduleEnabled">
                 <SelectTrigger id="schedule-time">
                   <div class="flex items-center space-x-2">
                     <Clock class="w-4 h-4" />
@@ -178,7 +183,6 @@ function toggleTheme() {
             >
               <Label for="schedule-frequency">Frequency</Label>
               <SelectRoot
-                v-if="schedule"
                 v-model="schedule.frequency"
                 :disabled="!scheduleEnabled"
               >
@@ -247,7 +251,7 @@ function toggleTheme() {
         </Card>
 
         <!-- Save Settings -->
-        <Button class="w-full"> Save Settings </Button>
+        <Button class="w-full" @click="saveSettings"> Save Settings </Button>
 
         <!-- App Info Section -->
         <Card class="p-6 bg-transparent">
