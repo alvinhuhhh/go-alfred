@@ -12,6 +12,10 @@ const chatId: string = route.params.id as string;
 const initDataRaw = useState<string>("initDataRaw");
 
 const schedule = ref<Schedule>();
+const scheduleEnabled = ref(false);
+const scheduleTime = ref(null);
+const scheduleFrequency = ref(null);
+const isDarkMode = ref(getTheme() === "dark");
 
 const {
   data: raw,
@@ -42,11 +46,6 @@ watch(
   },
   { immediate: true },
 );
-
-const scheduleEnabled = ref(false);
-const scheduleTime = ref(null);
-const scheduleFrequency = ref(null);
-const isDarkMode = ref(getTheme() === "dark");
 
 const timeOptions = [
   { value: "00:00", label: "0:00 AM" },
@@ -134,7 +133,7 @@ function toggleTheme() {
                   Turn scheduled messages on or off
                 </p>
               </div>
-              <Switch id="schedule-enabled" />
+              <Switch id="schedule-enabled" :value="scheduleEnabled" />
             </div>
 
             <!-- Time Selection -->
@@ -196,7 +195,7 @@ function toggleTheme() {
             </div>
 
             <!-- Current Schedule Summary -->
-            <div class="p-3 bg-muted rounded-lg">
+            <div class="p-3 bg-muted rounded-lg" :hidden="!scheduleEnabled">
               <p class="text-sm">
                 <span class="font-medium">Current schedule:</span> Messages will
                 be sent
