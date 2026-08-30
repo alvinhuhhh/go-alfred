@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import parse from "cron-parser";
 import cronstrue from "cronstrue";
+import { CronExpressionParser } from "cron-parser";
 import { ArrowLeft, Moon, Sun, MessageSquare, Clock } from "lucide-vue-next";
 
 interface Schedule {
@@ -92,7 +92,7 @@ const frequencyOptions = [
 
 function parseCron(cron: string) {
   try {
-    const interval = parse.parse(cron);
+    const interval = CronExpressionParser.parse(cron);
     const nextDate = interval.next().toDate();
     const time = nextDate.toLocaleTimeString("en-SG", {
       hour: "2-digit",
