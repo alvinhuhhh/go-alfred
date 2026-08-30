@@ -144,7 +144,11 @@ function toggleTheme() {
               :class="!scheduleEnabled ? 'opacity-50' : ''"
             >
               <Label for="schedule-time">Time</Label>
-              <SelectRoot v-model="schedule?.time" :disabled="!scheduleEnabled">
+              <SelectRoot
+                v-if="schedule"
+                v-model="schedule.time"
+                :disabled="!scheduleEnabled"
+              >
                 <SelectTrigger id="schedule-time">
                   <div class="flex items-center space-x-2">
                     <Clock class="w-4 h-4" />
@@ -174,7 +178,8 @@ function toggleTheme() {
             >
               <Label for="schedule-frequency">Frequency</Label>
               <SelectRoot
-                v-model="schedule?.frequency"
+                v-if="schedule"
+                v-model="schedule.frequency"
                 :disabled="!scheduleEnabled"
               >
                 <SelectTrigger id="schedule-frequency">
