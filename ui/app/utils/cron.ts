@@ -1,9 +1,7 @@
-import CronExpressionParser from "cron-parser";
+import { CronExpressionParser } from "cron-parser";
 
 function getTime(cron: string): string {
   try {
-    console.log(cron);
-
     const interval = CronExpressionParser.parse(cron);
     const nextDate = interval.next().toDate();
     const time = nextDate.toLocaleTimeString("en-SG", {
