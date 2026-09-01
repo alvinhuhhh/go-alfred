@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import cronstrue from "cronstrue";
-import { CronExpressionParser } from "cron-parser";
 import { ArrowLeft, Moon, Sun, MessageSquare, Clock } from "lucide-vue-next";
 import { getFrequency, getTime } from "~/utils/cron";
 
