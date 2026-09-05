@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import cronstrue from "cronstrue";
 import { ArrowLeft, Moon, Sun, MessageSquare, Clock } from "lucide-vue-next";
 import { getCron, getFrequency, getSummary, getTime } from "~/utils/cron";
 
@@ -91,7 +90,6 @@ const timeOptions = [
 ];
 
 const frequencyOptions = [
-  { value: "-", label: "Custom" },
   { value: "*", label: "Daily" },
   { value: "1-5", label: "Weekdays Only" },
   { value: "0,6", label: "Weekends Only" },
