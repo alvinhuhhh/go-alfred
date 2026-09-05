@@ -20,7 +20,7 @@
     "cronstrue": "3.24.0",
     "jsdom": "27.4.0",
     "lucide-vue-next": "0.562.0",
-    "nuxt": "4.5.1",
+    "nuxt": "4.5.2",
     "reka-ui": "2.10.4",
     "tailwindcss": "4.3.3",
     "vitest": "4.1.10",
