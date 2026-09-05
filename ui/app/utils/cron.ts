@@ -37,7 +37,8 @@ function getCron(time: string, frequency: string): string {
 }
 
 function getSummary(time: string, frequency: string): string {
-  const local = getCron(time, frequency);
+  const hour = time.split(":").map(Number)[0] ?? 0;
+  const local = `0 ${hour} * * ${frequency}`;
   return cronstrue.toString(local, {
     verbose: true,
   });

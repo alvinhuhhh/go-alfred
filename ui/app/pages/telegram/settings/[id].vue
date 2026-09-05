@@ -250,6 +250,7 @@ async function saveSettings() {
             <div class="p-3 bg-muted rounded-lg" :hidden="!schedule.enabled">
               <p class="text-sm">
                 <span class="font-medium">Current schedule:</span>
+                <br />
                 <span class="font-medium">{{ schedule?.summary }}</span>
               </p>
             </div>
