@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import cronstrue from "cronstrue";
 import { ArrowLeft, Moon, Sun, MessageSquare, Clock } from "lucide-vue-next";
-import { getCron, getFrequency, getTime } from "~/utils/cron";
+import { getCron, getFrequency, getSummary, getTime } from "~/utils/cron";
 
 interface Schedule {
   enabled: boolean;
@@ -53,7 +53,7 @@ watch(
       enabled: true,
       time: getTime(json.cron),
       frequency: getFrequency(json.cron),
-      summary: cronstrue.toString(json.cron, { verbose: true }),
+      summary: getSummary(json.cron),
     };
     initialSchedule.value = structuredClone(data);
     schedule.value = data;

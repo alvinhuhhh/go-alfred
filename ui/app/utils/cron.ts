@@ -1,3 +1,4 @@
+import cronstrue from "cronstrue";
 import { CronExpressionParser } from "cron-parser";
 
 function getTime(cron: string): string {
@@ -35,4 +36,10 @@ function getCron(time: string, frequency: string): string {
   return `0 ${date.getUTCHours()} * * ${frequency}`;
 }
 
-export { getTime, getFrequency, getCron };
+function getSummary(cron: string): string {
+  const interval = CronExpressionParser.parse(cron, { tz: "UTC" });
+  const local = interval.toString();
+  return cronstrue.toString(local, { verbose: true });
+}
+
+export { getTime, getFrequency, getCron, getSummary };
