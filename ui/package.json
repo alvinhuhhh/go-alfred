@@ -14,7 +14,7 @@
   "dependencies": {
     "@nuxt/test-utils": "4.0.3",
     "@tailwindcss/vite": "4.3.3",
-    "@tma.js/sdk-vue": "1.0.22",
+    "@tma.js/sdk-vue": "1.0.23",
     "@vue/test-utils": "2.4.11",
     "cron-parser": "5.10.0",
     "cronstrue": "3.24.0",
