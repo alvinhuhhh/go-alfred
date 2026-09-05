@@ -25,7 +25,9 @@ const initialSchedule = ref<Schedule>(defaultSchedule);
 const schedule = ref<Schedule>(defaultSchedule);
 const isDarkMode = ref(getTheme() === "dark");
 const isChanged = computed<boolean>(() => {
-  return !(schedule.value === initialSchedule.value);
+  return (
+    JSON.stringify(schedule.value) !== JSON.stringify(initialSchedule.value)
+  );
 });
 
 const {
@@ -106,7 +108,7 @@ function toggleTheme() {
 async function saveSettings() {
   console.debug(schedule.value);
   console.debug(initialSchedule.value);
-  if (!isChanged) return navigateTo("/telegram");
+  if (!isChanged.value) return navigateTo("/telegram");
 
   if (!schedule.value.enabled) {
     console.debug("Schedule disabled, sending DELETE request");
