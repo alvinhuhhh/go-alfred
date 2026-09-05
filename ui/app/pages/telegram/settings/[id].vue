@@ -4,7 +4,7 @@ import { ArrowLeft, Moon, Sun, MessageSquare, Clock } from "lucide-vue-next";
 import { getCron, getFrequency, getTime } from "~/utils/cron";
 
 interface Schedule {
-  enabled: boolean
+  enabled: boolean;
   time: string;
   frequency: string;
   summary: string | null;
@@ -25,6 +25,9 @@ const defaultSchedule: Schedule = {
 const initialSchedule = ref<Schedule>(defaultSchedule);
 const schedule = ref<Schedule>(defaultSchedule);
 const isDarkMode = ref(getTheme() === "dark");
+const isChanged = computed<boolean>(() => {
+  return !(schedule.value === initialSchedule.value);
+});
 
 const {
   data: raw,
@@ -101,11 +104,20 @@ function toggleTheme() {
 }
 
 async function saveSettings() {
-  if (
-    schedule.value.enabled !== initialSchedule.value.enabled ||
-    schedule.value.time !== initialSchedule.value.time ||
-    schedule.value.frequency !== initialSchedule.value.frequency
-  ) {
+  console.log(schedule.value);
+  console.log(initialSchedule.value);
+  if (!isChanged) return navigateTo("/telegram");
+
+  if (!schedule.value.enabled) {
+    console.debug("Schedule disabled, sending DELETE request");
+    await $fetch(`/api/settings/cron/dinner-${chatId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `tma ${initDataRaw.value}`,
+      },
+    });
+  } else {
+    console.debug("Schedule updated, sending POST request");
     const cron = getCron(schedule.value.time, schedule.value.frequency);
     const body = {
       url: useRequestURL().hostname + "/api/cron",
@@ -122,6 +134,7 @@ async function saveSettings() {
       },
     });
   }
+
   return navigateTo("/telegram");
 }
 </script>
