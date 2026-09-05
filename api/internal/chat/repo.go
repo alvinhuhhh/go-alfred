@@ -6,7 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type Repo interface{
+type Repo interface {
 	GetChatByID(ctx context.Context, id int64) (*Chat, error)
 	InsertChat(ctx context.Context, chat *Chat) (int64, error)
 }

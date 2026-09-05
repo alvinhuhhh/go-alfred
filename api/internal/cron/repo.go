@@ -3,13 +3,15 @@ package cron
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/jmoiron/sqlx"
 )
 
 type Repo interface {
-	Schedule(ctx context.Context, jobname, schedule, url string, chat_id int64) error
-	Unschedule(ctx context.Context, jobname string) error
+	GetSchedule(ctx context.Context, jobName string) (string, error)
+	Schedule(ctx context.Context, job *CronJob) error
+	Unschedule(ctx context.Context, jobName string) error
 }
 
 type repo struct {
@@ -20,39 +22,45 @@ func NewRepo(db *sqlx.DB) (Repo, error) {
 	return &repo{db: db}, nil
 }
 
-func (r repo) Schedule(ctx context.Context, jobname, schedule, url string, chat_id int64) error {
-	query := `
-		SELECT cron.schedule(
-			?,
-			?,
-			$$
-				SELECT
-					net.http_post(
-						url:=?,
-						body:=?
-					) AS request_id
-			$$
-		)
-	`
+func (r repo) GetSchedule(ctx context.Context, jobName string) (string, error) {
+	query := "SELECT schedule FROM cron.job WHERE jobname = ?"
 	query = r.db.Rebind(query)
+	var s string
+	err := r.db.GetContext(ctx, &s, query, jobName)
+	return s, err
+}
 
+func (r repo) Schedule(ctx context.Context, job *CronJob) error {
+	// Build the JSON body
 	bodyData := map[string]interface{}{
-		"chat_id": chat_id,
+		"chat_id": job.ChatId,
 	}
-	body, err := json.Marshal(bodyData)
+	bodyBytes, err := json.Marshal(bodyData)
 	if err != nil {
 		return err
 	}
-	if _, err := r.db.ExecContext(ctx, query, jobname, schedule, url, body); err != nil {
+	body := string(bodyBytes)
+
+	// Construct the command string that pg_cron will execute
+	command := fmt.Sprintf(
+		"SELECT * FROM http_post('%s', '%s', 'application/json')",
+		job.URL, body,
+	)
+
+	// Outer query uses placeholders for the cron function arguments
+	query := `SELECT cron.schedule(?, ?, ?)`
+	query = r.db.Rebind(query)
+
+	if _, err := r.db.ExecContext(ctx, query, job.JobName, job.Schedule, command); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r repo) Unschedule(ctx context.Context, jobname string) error {
+func (r repo) Unschedule(ctx context.Context, jobName string) error {
 	query := "SELECT cron.unschedule(?)"
 	query = r.db.Rebind(query)
-	_, err := r.db.ExecContext(ctx, query, jobname)
+	_, err := r.db.ExecContext(ctx, query, jobName)
 	if err != nil {
 		return err
 	}

@@ -1,14 +1,74 @@
-<script setup>
+<script setup lang="ts">
 import { ArrowLeft, Moon, Sun, MessageSquare, Clock } from "lucide-vue-next";
+import { getCron, getFrequency, getSummary, getTime } from "~/utils/cron";
+
+interface Schedule {
+  enabled: boolean;
+  time: string;
+  frequency: string;
+  summary: string | null;
+}
 
 const { public: config } = useRuntimeConfig();
 
-const scheduleEnabled = ref(true);
-const scheduleTime = ref(null);
-const scheduleFrequency = ref(null);
+const route = useRoute();
+const chatId: string = route.params.id as string;
+const initDataRaw = useState<string>("initDataRaw");
+const defaultSchedule: Schedule = {
+  enabled: false,
+  time: "00:00",
+  frequency: "daily",
+  summary: "",
+};
+
+const initialSchedule = ref<Schedule>(defaultSchedule);
+const schedule = ref<Schedule>(defaultSchedule);
 const isDarkMode = ref(getTheme() === "dark");
+const isChanged = computed<boolean>(() => {
+  return !(schedule.value === initialSchedule.value);
+});
+
+const {
+  data: raw,
+  pending,
+  error,
+  refresh,
+} = await useAsyncData<string>("cron", () =>
+  $fetch(`/api/settings/cron/dinner-${chatId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `tma ${initDataRaw.value}`,
+    },
+  }),
+);
+
+watch(
+  raw,
+  (raw) => {
+    if (!raw) return;
+    const json = JSON.parse(raw);
+    const time = getTime(json.cron);
+    const frequency = getFrequency(json.cron);
+
+    const data: Schedule = {
+      enabled: true,
+      time: time,
+      frequency: frequency,
+      summary: getSummary(time, frequency),
+    };
+    initialSchedule.value = structuredClone(data);
+    schedule.value = data;
+  },
+  { immediate: true },
+);
 
 const timeOptions = [
+  { value: "00:00", label: "0:00 AM" },
+  { value: "01:00", label: "1:00 AM" },
+  { value: "02:00", label: "2:00 AM" },
+  { value: "03:00", label: "3:00 AM" },
+  { value: "04:00", label: "4:00 AM" },
+  { value: "05:00", label: "5:00 AM" },
   { value: "06:00", label: "6:00 AM" },
   { value: "07:00", label: "7:00 AM" },
   { value: "08:00", label: "8:00 AM" },
@@ -26,19 +86,13 @@ const timeOptions = [
   { value: "20:00", label: "8:00 PM" },
   { value: "21:00", label: "9:00 PM" },
   { value: "22:00", label: "10:00 PM" },
+  { value: "23:00", label: "11:00 PM" },
 ];
 
 const frequencyOptions = [
-  { value: "daily", label: "Daily" },
-  { value: "weekdays", label: "Weekdays Only" },
-  { value: "weekends", label: "Weekends Only" },
-  { value: "monday", label: "Every Monday" },
-  { value: "tuesday", label: "Every Tuesday" },
-  { value: "wednesday", label: "Every Wednesday" },
-  { value: "thursday", label: "Every Thursday" },
-  { value: "friday", label: "Every Friday" },
-  { value: "saturday", label: "Every Saturday" },
-  { value: "sunday", label: "Every Sunday" },
+  { value: "*", label: "Daily" },
+  { value: "1-5", label: "Weekdays Only" },
+  { value: "0,6", label: "Weekends Only" },
 ];
 
 function back() {
@@ -47,6 +101,41 @@ function back() {
 
 function toggleTheme() {
   setTheme(getTheme() === "light" ? "dark" : "light");
+}
+
+async function saveSettings() {
+  console.debug(schedule.value);
+  console.debug(initialSchedule.value);
+  if (!isChanged) return navigateTo("/telegram");
+
+  if (!schedule.value.enabled) {
+    console.debug("Schedule disabled, sending DELETE request");
+    await $fetch(`/api/settings/cron/dinner-${chatId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `tma ${initDataRaw.value}`,
+      },
+    });
+  } else {
+    console.debug("Schedule updated, sending POST request");
+    const cron = getCron(schedule.value.time, schedule.value.frequency);
+    const body = {
+      url: useRequestURL().hostname + "/api/cron",
+      chatId: parseInt(chatId),
+      jobName: `dinner-${chatId}`,
+      schedule: cron,
+    };
+
+    await $fetch("/api/settings/cron", {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: {
+        Authorization: `tma ${initDataRaw.value}`,
+      },
+    });
+  }
+
+  return navigateTo("/telegram");
 }
 </script>
 
@@ -94,16 +183,16 @@ function toggleTheme() {
                   Turn scheduled messages on or off
                 </p>
               </div>
-              <Switch id="schedule-enabled" />
+              <Switch id="schedule-enabled" v-model="schedule.enabled" />
             </div>
 
             <!-- Time Selection -->
             <div
               class="space-y-2"
-              :class="!scheduleEnabled ? 'opacity-50' : ''"
+              :class="!schedule.enabled ? 'opacity-50' : ''"
             >
               <Label for="schedule-time">Time</Label>
-              <SelectRoot :value="scheduleTime" :disabled="!scheduleEnabled">
+              <SelectRoot v-model="schedule.time" :disabled="!schedule.enabled">
                 <SelectTrigger id="schedule-time">
                   <div class="flex items-center space-x-2">
                     <Clock class="w-4 h-4" />
@@ -129,12 +218,12 @@ function toggleTheme() {
             <!-- Frequency Selection -->
             <div
               class="space-y-2"
-              :class="!scheduleEnabled ? 'opacity-50' : ''"
+              :class="!schedule.enabled ? 'opacity-50' : ''"
             >
               <Label for="schedule-frequency">Frequency</Label>
               <SelectRoot
-                :value="scheduleFrequency"
-                :disabled="!scheduleEnabled"
+                v-model="schedule.frequency"
+                :disabled="!schedule.enabled"
               >
                 <SelectTrigger id="schedule-frequency">
                   <SelectValue placeholder="Select frequency" />
@@ -156,12 +245,11 @@ function toggleTheme() {
             </div>
 
             <!-- Current Schedule Summary -->
-            <div class="p-3 bg-muted rounded-lg">
+            <div class="p-3 bg-muted rounded-lg" :hidden="!schedule.enabled">
               <p class="text-sm">
-                <span class="font-medium">Current schedule:</span> Messages will
-                be sent
-                <span class="font-medium"></span>
-                <span class="font-medium"> </span>
+                <span class="font-medium">Current schedule:</span>
+                <br />
+                <span class="font-medium">{{ schedule?.summary }}</span>
               </p>
             </div>
           </div>
@@ -202,7 +290,7 @@ function toggleTheme() {
         </Card>
 
         <!-- Save Settings -->
-        <Button class="w-full"> Save Settings </Button>
+        <Button class="w-full" @click="saveSettings"> Save Settings </Button>
 
         <!-- App Info Section -->
         <Card class="p-6 bg-transparent">

@@ -7,6 +7,8 @@ import {
   Sparkles,
 } from "lucide-vue-next";
 
+const { public: config } = useRuntimeConfig();
+
 const features = [
   {
     title: "Secure Notebook",
@@ -167,7 +169,10 @@ function handleGetStarted() {
 
       <!-- Footer -->
       <div class="text-center py-16 text-muted-foreground">
-        <p>Alfred v1.0 - Your digital butler, powered by Telegram</p>
+        <p>
+          Alfred v{{ config.appVersion }} - Your digital butler, powered by
+          Telegram
+        </p>
       </div>
     </div>
   </div>

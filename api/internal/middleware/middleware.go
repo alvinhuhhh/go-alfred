@@ -62,7 +62,7 @@ func Auth(next http.Handler) http.Handler {
 		// Allow routes in whitelist
 		if slices.Contains(whitelist, r.URL.Path) {
 			next.ServeHTTP(w, r)
-			return 
+			return
 		}
 
 		// Get raw init data
