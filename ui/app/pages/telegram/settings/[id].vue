@@ -55,7 +55,7 @@ watch(
       frequency: getFrequency(json.cron),
       summary: cronstrue.toString(json.cron, { verbose: true }),
     };
-    initialSchedule.value = data;
+    initialSchedule.value = structuredClone(data);
     schedule.value = data;
   },
   { immediate: true },
@@ -104,8 +104,8 @@ function toggleTheme() {
 }
 
 async function saveSettings() {
-  console.log(schedule.value);
-  console.log(initialSchedule.value);
+  console.debug(schedule.value);
+  console.debug(initialSchedule.value);
   if (!isChanged) return navigateTo("/telegram");
 
   if (!schedule.value.enabled) {
@@ -121,7 +121,7 @@ async function saveSettings() {
     const cron = getCron(schedule.value.time, schedule.value.frequency);
     const body = {
       url: useRequestURL().hostname + "/api/cron",
-      chatId: chatId,
+      chatId: parseInt(chatId),
       jobName: `dinner-${chatId}`,
       schedule: cron,
     };
