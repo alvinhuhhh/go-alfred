@@ -48,12 +48,14 @@ watch(
   (raw) => {
     if (!raw) return;
     const json = JSON.parse(raw);
+    const time = getTime(json.cron);
+    const frequency = getFrequency(json.cron);
 
     const data: Schedule = {
       enabled: true,
-      time: getTime(json.cron),
-      frequency: getFrequency(json.cron),
-      summary: getSummary(json.cron),
+      time: time,
+      frequency: frequency,
+      summary: getSummary(time, frequency),
     };
     initialSchedule.value = structuredClone(data);
     schedule.value = data;

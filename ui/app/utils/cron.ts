@@ -36,10 +36,11 @@ function getCron(time: string, frequency: string): string {
   return `0 ${date.getUTCHours()} * * ${frequency}`;
 }
 
-function getSummary(cron: string): string {
-  const interval = CronExpressionParser.parse(cron, { tz: "UTC" });
-  const local = interval.toString();
-  return cronstrue.toString(local, { verbose: true });
+function getSummary(time: string, frequency: string): string {
+  const local = getCron(time, frequency);
+  return cronstrue.toString(local, {
+    verbose: true,
+  });
 }
 
 export { getTime, getFrequency, getCron, getSummary };
