@@ -35,4 +35,13 @@ function getFrequency(
   }
 }
 
-export { getTime, getFrequency };
+function getCron(time: string, frequency: string): string {
+  const hour: number = time.split(":").map(Number)[0] ?? 0;
+
+  const date = new Date();
+  date.setHours(hour, 0, 0, 0);
+
+  return `0 ${date.getUTCHours()} * * ${frequency}`;
+}
+
+export { getTime, getFrequency, getCron };

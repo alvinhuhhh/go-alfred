@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import cronstrue from "cronstrue";
 import { ArrowLeft, Moon, Sun, MessageSquare, Clock } from "lucide-vue-next";
-import { getFrequency, getTime } from "~/utils/cron";
+import { getCron, getFrequency, getTime } from "~/utils/cron";
 
 interface Schedule {
-  cron: string;
   time: string;
   frequency: string;
   summary: string | null;
@@ -15,13 +14,14 @@ const { public: config } = useRuntimeConfig();
 const route = useRoute();
 const chatId: string = route.params.id as string;
 const initDataRaw = useState<string>("initDataRaw");
-
-const schedule = ref<Schedule>({
-  cron: "0 * * * *",
+const defaultSchedule: Schedule = {
   time: "00:00",
   frequency: "daily",
   summary: "",
-});
+};
+
+const initialSchedule = ref<Schedule>(defaultSchedule);
+const schedule = ref<Schedule>(defaultSchedule);
 const scheduleEnabled = ref(false);
 const isDarkMode = ref(getTheme() === "dark");
 
@@ -45,12 +45,13 @@ watch(
     if (!raw) return;
     const json = JSON.parse(raw);
 
-    schedule.value = {
-      cron: json.cron,
+    const data: Schedule = {
       time: getTime(json.cron),
       frequency: getFrequency(json.cron),
       summary: cronstrue.toString(json.cron, { verbose: true }),
     };
+    initialSchedule.value = data;
+    schedule.value = data;
     scheduleEnabled.value = true;
   },
   { immediate: true },
@@ -84,10 +85,10 @@ const timeOptions = [
 ];
 
 const frequencyOptions = [
-  { value: "custom", label: "Custom" },
-  { value: "daily", label: "Daily" },
-  { value: "weekdays", label: "Weekdays Only" },
-  { value: "weekends", label: "Weekends Only" },
+  { value: "-", label: "Custom" },
+  { value: "*", label: "Daily" },
+  { value: "1-5", label: "Weekdays Only" },
+  { value: "0,6", label: "Weekends Only" },
 ];
 
 function back() {
@@ -98,8 +99,28 @@ function toggleTheme() {
   setTheme(getTheme() === "light" ? "dark" : "light");
 }
 
-function saveSettings() {
-  console.log(schedule.value);
+async function saveSettings() {
+  if (
+    schedule.value.time !== initialSchedule.value.time ||
+    schedule.value.frequency !== initialSchedule.value.frequency
+  ) {
+    const cron = getCron(schedule.value.time, schedule.value.frequency);
+    const body = {
+      url: useRequestURL().hostname + "/api/cron",
+      chatId: chatId,
+      jobName: `dinner-${chatId}`,
+      schedule: cron,
+    };
+
+    await $fetch("/api/settings/cron", {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: {
+        Authorization: `tma ${initDataRaw.value}`,
+      },
+    });
+  }
+  return navigateTo("/telegram");
 }
 </script>
 
