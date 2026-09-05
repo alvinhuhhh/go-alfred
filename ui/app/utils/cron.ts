@@ -2,9 +2,8 @@ import { CronExpressionParser } from "cron-parser";
 
 function getTime(cron: string): string {
   try {
-    const interval = CronExpressionParser.parse(cron);
-    const nextDate = interval.next().toDate();
-    const time = nextDate.toLocaleTimeString("en-SG", {
+    const interval = CronExpressionParser.parse(cron, { tz: "UTC" });
+    const time = interval.next().toDate().toLocaleTimeString("en-SG", {
       hour: "2-digit",
       minute: "2-digit",
       hour12: false,
@@ -16,9 +15,7 @@ function getTime(cron: string): string {
   }
 }
 
-function getFrequency(
-  cron: string,
-): string {
+function getFrequency(cron: string): string {
   try {
     const parts = cron.trim().split(" ");
     if (parts.length < 5) return "-";
