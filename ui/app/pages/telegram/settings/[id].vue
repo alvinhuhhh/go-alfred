@@ -4,6 +4,7 @@ import { ArrowLeft, Moon, Sun, MessageSquare, Clock } from "lucide-vue-next";
 import { getCron, getFrequency, getTime } from "~/utils/cron";
 
 interface Schedule {
+  enabled: boolean
   time: string;
   frequency: string;
   summary: string | null;
@@ -15,6 +16,7 @@ const route = useRoute();
 const chatId: string = route.params.id as string;
 const initDataRaw = useState<string>("initDataRaw");
 const defaultSchedule: Schedule = {
+  enabled: false,
   time: "00:00",
   frequency: "daily",
   summary: "",
@@ -22,7 +24,6 @@ const defaultSchedule: Schedule = {
 
 const initialSchedule = ref<Schedule>(defaultSchedule);
 const schedule = ref<Schedule>(defaultSchedule);
-const scheduleEnabled = ref(false);
 const isDarkMode = ref(getTheme() === "dark");
 
 const {
@@ -46,13 +47,13 @@ watch(
     const json = JSON.parse(raw);
 
     const data: Schedule = {
+      enabled: true,
       time: getTime(json.cron),
       frequency: getFrequency(json.cron),
       summary: cronstrue.toString(json.cron, { verbose: true }),
     };
     initialSchedule.value = data;
     schedule.value = data;
-    scheduleEnabled.value = true;
   },
   { immediate: true },
 );
@@ -101,6 +102,7 @@ function toggleTheme() {
 
 async function saveSettings() {
   if (
+    schedule.value.enabled !== initialSchedule.value.enabled ||
     schedule.value.time !== initialSchedule.value.time ||
     schedule.value.frequency !== initialSchedule.value.frequency
   ) {
@@ -168,16 +170,16 @@ async function saveSettings() {
                   Turn scheduled messages on or off
                 </p>
               </div>
-              <Switch id="schedule-enabled" v-model="scheduleEnabled" />
+              <Switch id="schedule-enabled" v-model="schedule.enabled" />
             </div>
 
             <!-- Time Selection -->
             <div
               class="space-y-2"
-              :class="!scheduleEnabled ? 'opacity-50' : ''"
+              :class="!schedule.enabled ? 'opacity-50' : ''"
             >
               <Label for="schedule-time">Time</Label>
-              <SelectRoot v-model="schedule.time" :disabled="!scheduleEnabled">
+              <SelectRoot v-model="schedule.time" :disabled="!schedule.enabled">
                 <SelectTrigger id="schedule-time">
                   <div class="flex items-center space-x-2">
                     <Clock class="w-4 h-4" />
@@ -203,12 +205,12 @@ async function saveSettings() {
             <!-- Frequency Selection -->
             <div
               class="space-y-2"
-              :class="!scheduleEnabled ? 'opacity-50' : ''"
+              :class="!schedule.enabled ? 'opacity-50' : ''"
             >
               <Label for="schedule-frequency">Frequency</Label>
               <SelectRoot
                 v-model="schedule.frequency"
-                :disabled="!scheduleEnabled"
+                :disabled="!schedule.enabled"
               >
                 <SelectTrigger id="schedule-frequency">
                   <SelectValue placeholder="Select frequency" />
@@ -230,10 +232,9 @@ async function saveSettings() {
             </div>
 
             <!-- Current Schedule Summary -->
-            <div class="p-3 bg-muted rounded-lg" :hidden="!scheduleEnabled">
+            <div class="p-3 bg-muted rounded-lg" :hidden="!schedule.enabled">
               <p class="text-sm">
-                <span class="font-medium">Current schedule:</span> Messages will
-                be sent
+                <span class="font-medium">Current schedule:</span>
                 <span class="font-medium">{{ schedule?.summary }}</span>
               </p>
             </div>

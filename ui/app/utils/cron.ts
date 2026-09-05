@@ -18,20 +18,14 @@ function getTime(cron: string): string {
 
 function getFrequency(
   cron: string,
-): "custom" | "daily" | "weekdays" | "weekends" {
+): string {
   try {
     const parts = cron.trim().split(" ");
-
-    if (parts.length < 5) return "custom";
-
-    if (parts[4] === "*") return "daily";
-    if (parts[4] === "1-5") return "weekdays";
-    if (parts[4] === "0,6" || parts[4] === "6,0") return "weekends";
-
-    return "custom";
+    if (parts.length < 5) return "-";
+    return parts[4] as string;
   } catch (err) {
     console.error("Invalid cron expression", err);
-    return "custom";
+    return "-";
   }
 }
 
